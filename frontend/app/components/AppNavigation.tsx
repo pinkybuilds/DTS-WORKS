@@ -23,40 +23,9 @@ const navigationItems = [
   },
 ];
 
-const getBackNavigation = (pathname: string) => {
-  if (pathname === "/receipts/new-receipt") {
-    return {
-      href: "/receipts",
-      label: "Receipts",
-    };
-  }
-
-  if (pathname === "/receipts") {
-    return {
-      href: "/",
-      label: "Dashboard",
-    };
-  }
-
-  if (
-    pathname === "/compliance" ||
-    pathname === "/site-profile" ||
-    pathname === "/settings"
-  ) {
-    return {
-      href: "/",
-      label: "Dashboard",
-    };
-  }
-
-  return null;
-};
-
 export default function AppNavigation() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const backNavigation = getBackNavigation(pathname);
 
   return (
     <>
@@ -129,18 +98,6 @@ export default function AppNavigation() {
             </div>
           </nav>
         </>
-      )}
-
-      {/* Contextual back link */}
-      {backNavigation && (
-        <div className="border-b border-slate-200 bg-white px-5 py-4 md:px-8">
-          <Link
-            href={backNavigation.href}
-            className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
-          >
-            ← {backNavigation.label}
-          </Link>
-        </div>
       )}
     </>
   );

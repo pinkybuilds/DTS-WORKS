@@ -56,19 +56,16 @@ export default function Home() {
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <section className="w-full">
         {/* Dashboard heading */}
-        <div className="border-b border-slate-200 bg-white">
-          <div className="px-6 py-7 md:px-10 md:py-8">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Dashboard
-            </h1>
-          </div>
+        <div className="px-6 pt-7 md:px-10 md:pt-8">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Dashboard
+          </h1>
         </div>
 
         {/* Dashboard content */}
-        <div className="px-6 py-9 md:px-10 md:py-10">
-
+        <div className="px-6 pb-10 pt-6 md:px-10 md:pb-12 md:pt-7">
           {/* Welcome */}
-          <div className="mb-10">
+          <div className="mb-8">
             <h2 className="text-3xl font-semibold tracking-tight">
               Welcome back
             </h2>
@@ -80,7 +77,7 @@ export default function Home() {
           </div>
 
           {/* New receipt */}
-          <div className="mb-12">
+          <div className="mb-10">
             <Link
               href="/receipts/new-receipt"
               className="inline-block rounded-xl bg-[#0f172a] px-6 py-4 text-left text-white transition hover:bg-slate-800"
@@ -111,13 +108,13 @@ export default function Home() {
             </div>
 
             {loadingReceipts ? (
-              <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+              <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
                 <p className="text-sm text-slate-500">
                   Loading recent receipts...
                 </p>
               </div>
             ) : recentReceipts.length === 0 ? (
-              <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+              <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
                 <p className="text-sm font-medium text-slate-700">
                   No receipts yet
                 </p>
@@ -127,7 +124,7 @@ export default function Home() {
                 </p>
               </div>
             ) : (
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+              <div className="space-y-3">
                 {recentReceipts.map((receipt) => {
                   const wasteItem =
                     receipt.receipt_data?.waste_items?.[0];
@@ -159,17 +156,30 @@ export default function Home() {
                     <Link
                       key={receipt.id}
                       href={`/receipts/${receipt.id}`}
-                      className="block border-b border-slate-200 px-6 py-5 transition last:border-b-0 hover:bg-slate-50"
+                      className="block rounded-2xl border border-slate-800 bg-white px-5 py-4 transition hover:bg-slate-50 hover:shadow-sm md:px-6 md:py-4"
                     >
-                      <div className="flex items-center justify-between gap-6">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-slate-900">
-                            {wasteDescription}
-                          </p>
+                      <div className="flex items-center gap-4">
+                        {/* Receipt details */}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-3">
+                            <p className="truncate text-sm font-semibold text-slate-900">
+                              {wasteDescription}
+                            </p>
 
-                          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                            <span
+                              className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass}`}
+                            >
+                              {status}
+                            </span>
+                          </div>
+
+                          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                             <span>
                               EWC: {ewcCode}
+                            </span>
+
+                            <span className="text-slate-300">
+                              •
                             </span>
 
                             <span>
@@ -186,10 +196,12 @@ export default function Home() {
                           </p>
                         </div>
 
+                        {/* Arrow */}
                         <span
-                          className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${statusClass}`}
+                          aria-hidden="true"
+                          className="shrink-0 text-lg text-slate-500 transition-transform group-hover:translate-x-0.5"
                         >
-                          {status}
+                          →
                         </span>
                       </div>
                     </Link>
