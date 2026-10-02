@@ -125,12 +125,11 @@ export default function AppShell({
       </main>
     );
   }
-
-  return (
-    <div className="flex min-h-screen">
-      <AppNavigation />
-      <main className="min-w-0 flex-1">{children}</main>
-    </div>
-  );
+return (
+  <div className="min-h-screen">
+    <AppNavigation />
+    <main className="min-w-0">{children}</main>
+  </div>
+   );
 }
 
