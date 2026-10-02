@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -58,20 +60,16 @@ export default function AppNavigation() {
 
   return (
     <>
-      {/* Main navigation */}
-      <header className="relative z-50 w-full border-b border-slate-200 bg-white">
-        <div className="flex h-16 items-center justify-between px-5 md:px-8">
+      {/* Main navigation / hero */}
+      <header className="relative z-50 w-full border-b border-slate-300 bg-[#173A5E]">
+        <div className="flex h-[76px] items-center justify-between px-5 md:px-8">
           {/* Logo */}
-          <div className="flex flex-col items-start">
+          <div className="flex items-center">
             <img
               src="/branding/dts works logo real.png"
               alt="DTS Works"
-              className="h-6 w-auto object-contain"
+              className="h-9 w-auto object-contain"
             />
-
-            <span className="mt-0.5 text-[9px] font-semibold tracking-[0.18em] text-[#173A5E]">
-              WORKS
-            </span>
           </div>
 
           {/* Hamburger */}
@@ -84,7 +82,7 @@ export default function AppNavigation() {
                 : "Open navigation"
             }
             aria-expanded={menuOpen}
-            className="rounded-lg p-2 text-slate-700 transition hover:bg-slate-100"
+            className="rounded-lg p-2 text-white transition hover:bg-white/10"
           >
             <span className="text-2xl leading-none">
               {menuOpen ? "×" : "☰"}
@@ -105,7 +103,7 @@ export default function AppNavigation() {
           />
 
           {/* Drawer */}
-          <nav className="fixed right-0 top-16 z-50 w-72 max-w-[85vw] border-l border-b border-slate-200 bg-white p-4 shadow-xl">
+          <nav className="fixed right-0 top-[76px] z-50 w-72 max-w-[85vw] border-l border-b border-slate-200 bg-white p-4 shadow-xl">
             <div className="space-y-1">
               {navigationItems.map((item) => {
                 const isActive =
