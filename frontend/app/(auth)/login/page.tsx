@@ -1,14 +1,14 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 
 import { supabase } from "@/lib/supabase/client";
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-  console.log("API:", API_BASE_URL);
-  console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+
+console.log("API:", API_BASE_URL);
+console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,63 +18,76 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSigningIn, setIsSigningIn] = useState(false);
 
-  
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-  event.preventDefault();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-  setErrorMessage("");
-  setIsSigningIn(true);
+    setErrorMessage("");
+    setIsSigningIn(true);
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    setErrorMessage(error.message);
-    setIsSigningIn(false);
-    return;
-  }
-
-  const accessToken = data.session?.access_token;
-
-  if (!accessToken) {
-    setErrorMessage("Your session could not be established. Please try again.");
-    setIsSigningIn(false);
-    return;
-  }
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/site-profile`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
-    if (response.ok) {
-      // Onboarding is complete.
-      window.location.href = "/";
+    if (error) {
+      setErrorMessage(error.message);
+      setIsSigningIn(false);
       return;
     }
 
-    if (response.status === 404) {
-      // Account exists, but onboarding has not been completed.
-      window.location.href = "/onboarding";
+    const accessToken = data.session?.access_token;
+
+    if (!accessToken) {
+      setErrorMessage(
+        "Your session could not be established. Please try again.",
+      );
+      setIsSigningIn(false);
       return;
     }
 
-    setErrorMessage(
-      "We could not check your account setup. Please try again.",
-    );
-    setIsSigningIn(false);
-  } catch {
-    setErrorMessage(
-      "We could not connect to DTS Works. Please try again.",
-    );
-    setIsSigningIn(false);
-  }
-};
+    try {
+      const response = await fetch(`${API_BASE_URL}/site-profile`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        // Account setup is complete.
+        window.location.href = "/";
+        return;
+      }
+
+      let detail = "";
+
+      try {
+        const errorData = await response.json();
+        detail = errorData?.detail || "";
+      } catch {
+        // Ignore invalid or non-JSON error responses.
+      }
+
+      if (response.status === 404) {
+        setErrorMessage(
+          detail ||
+            "Your account is signed in, but we could not find your workspace.",
+        );
+        setIsSigningIn(false);
+        return;
+      }
+
+      setErrorMessage(
+        detail || "We could not check your account setup. Please try again.",
+      );
+      setIsSigningIn(false);
+    } catch {
+      setErrorMessage(
+        "We could not connect to DTS Works. Please try again.",
+      );
+      setIsSigningIn(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#0B1730] text-white">
