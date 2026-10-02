@@ -1,205 +1,147 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-type ReceiptData = {
-  waste_items?: {
-    ewc_codes?: string[];
-    waste_description?: string;
-  }[];
-};
+const navigationItems = [
+  {
+    label: "Dashboard",
+    href: "/",
+  },
+  {
+    label: "Receipts",
+    href: "/receipts",
+  },
+  {
+    label: "Site Profile",
+    href: "/site-profile",
+  },
+  {
+    label: "Settings",
+    href: "/settings",
+  },
+];
 
-type Movement = {
-  id: string;
-  date_time_received: string | null;
-  waste_tracking_id: string | null;
-  status: string | null;
-  defra_status: string | null;
-  receipt_data: ReceiptData | null;
-};
-
-export default function Home() {
-  const [recentReceipts, setRecentReceipts] = useState<Movement[]>([]);
-  const [loadingReceipts, setLoadingReceipts] = useState(true);
-
-  useEffect(() => {
-    const loadRecentReceipts = async () => {
-      const { data, error } = await supabase
-        .from("movements")
-        .select(`
-          id,
-          date_time_received,
-          waste_tracking_id,
-          status,
-          defra_status,
-          receipt_data
-        `)
-        .order("date_time_received", { ascending: false })
-        .limit(3);
-
-      if (error) {
-        console.error("Failed to load recent receipts:", error);
-        setRecentReceipts([]);
-      } else {
-        setRecentReceipts(data ?? []);
-      }
-
-      setLoadingReceipts(false);
+const getBackNavigation = (pathname: string) => {
+  if (pathname === "/receipts/new-receipt") {
+    return {
+      href: "/receipts",
+      label: "Receipts",
     };
+  }
 
-    loadRecentReceipts();
-  }, []);
+  if (pathname === "/receipts") {
+    return {
+      href: "/",
+      label: "Dashboard",
+    };
+  }
+
+  if (
+    pathname === "/compliance" ||
+    pathname === "/site-profile" ||
+    pathname === "/settings"
+  ) {
+    return {
+      href: "/",
+      label: "Dashboard",
+    };
+  }
+
+  return null;
+};
+
+export default function AppNavigation() {
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const backNavigation = getBackNavigation(pathname);
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
-      <section className="w-full">
-        {/* Dashboard heading */}
-        <div className="border-b border-slate-200 bg-white">
-          <div className="px-6 py-7 md:px-10 md:py-8">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Dashboard
-            </h1>
+    <>
+      {/* Main navigation / hero */}
+      <header className="relative z-50 w-full border-b border-slate-300 bg-[#0f172a]">
+        <div className="flex h-[76px] items-center justify-between px-5 md:px-8">
+          {/* Logo */}
+          <div className="flex items-center">
+            <img
+              src="/branding/dts works logo real.png"
+              alt="DTS Works"
+              className="h-12 w-auto object-contain"
+            />
           </div>
+
+          {/* Hamburger */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen((current) => !current)}
+            aria-label={
+              menuOpen
+                ? "Close navigation"
+                : "Open navigation"
+            }
+            aria-expanded={menuOpen}
+            className="rounded-lg p-2 text-white transition hover:bg-white/10"
+          >
+            <span className="text-2xl leading-none">
+              {menuOpen ? "×" : "☰"}
+            </span>
+          </button>
         </div>
+      </header>
 
-        {/* Dashboard content */}
-        <div className="px-6 py-9 md:px-10 md:py-10">
+      {/* Navigation drawer */}
+      {menuOpen && (
+        <>
+          {/* Backdrop */}
+          <button
+            type="button"
+            aria-label="Close navigation"
+            onClick={() => setMenuOpen(false)}
+            className="fixed inset-0 z-40 bg-black/10"
+          />
 
-          {/* Welcome */}
-          <div className="mb-10">
-            <h2 className="text-3xl font-semibold tracking-tight">
-              Welcome back
-            </h2>
+          {/* Drawer */}
+          <nav className="fixed right-0 top-[76px] z-50 w-72 max-w-[85vw] border-l border-b border-slate-200 bg-white p-4 shadow-xl">
+            <div className="space-y-1">
+              {navigationItems.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/" &&
+                    pathname.startsWith(`${item.href}/`));
 
-            <p className="mt-2 max-w-xl text-slate-600">
-              Manage your waste movements and keep every receipt
-              compliance-ready.
-            </p>
-          </div>
-
-          {/* New receipt */}
-          <div className="mb-12">
-            <Link
-              href="/receipts/new-receipt"
-              className="inline-block rounded-xl bg-slate-900 px-6 py-4 text-left text-white transition hover:bg-slate-800"
-            >
-              <div className="text-sm font-semibold">
-                + New waste receipt
-              </div>
-
-              <div className="mt-1 text-sm text-slate-300">
-                Record incoming waste
-              </div>
-            </Link>
-          </div>
-
-          {/* Recent receipts */}
-          <div>
-            <div className="mb-4 flex items-center justify-between gap-4">
-              <h3 className="text-lg font-semibold">
-                Recent receipts
-              </h3>
-
-              <Link
-                href="/receipts"
-                className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
-              >
-                View all receipts →
-              </Link>
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={`block rounded-lg px-4 py-3 text-sm transition ${
+                      isActive
+                        ? "bg-slate-100 font-medium text-slate-900"
+                        : "font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
             </div>
+          </nav>
+        </>
+      )}
 
-            {loadingReceipts ? (
-              <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
-                <p className="text-sm text-slate-500">
-                  Loading recent receipts...
-                </p>
-              </div>
-            ) : recentReceipts.length === 0 ? (
-              <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
-                <p className="text-sm font-medium text-slate-700">
-                  No receipts yet
-                </p>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Your recorded waste receipts will appear here.
-                </p>
-              </div>
-            ) : (
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {recentReceipts.map((receipt) => {
-                  const wasteItem =
-                    receipt.receipt_data?.waste_items?.[0];
-
-                  const wasteDescription =
-                    wasteItem?.waste_description || "Waste receipt";
-
-                  const ewcCode =
-                    wasteItem?.ewc_codes?.[0] || "—";
-
-                  const displayId =
-                    receipt.waste_tracking_id || receipt.id;
-
-                  const status =
-                    receipt.defra_status === "ACCEPTED"
-                      ? "Accepted"
-                      : receipt.defra_status === "REJECTED"
-                        ? "Rejected"
-                        : receipt.status || "—";
-
-                  const statusClass =
-                    receipt.defra_status === "ACCEPTED"
-                      ? "bg-green-50 text-green-700"
-                      : receipt.defra_status === "REJECTED"
-                        ? "bg-red-50 text-red-700"
-                        : "bg-slate-100 text-slate-700";
-
-                  return (
-                    <Link
-                      key={receipt.id}
-                      href={`/receipts/${receipt.id}`}
-                      className="block border-b border-slate-200 px-6 py-5 transition last:border-b-0 hover:bg-slate-50"
-                    >
-                      <div className="flex items-center justify-between gap-6">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-slate-900">
-                            {wasteDescription}
-                          </p>
-
-                          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
-                            <span>
-                              EWC: {ewcCode}
-                            </span>
-
-                            <span>
-                              {receipt.date_time_received
-                                ? new Date(
-                                    receipt.date_time_received
-                                  ).toLocaleDateString("en-GB")
-                                : "—"}
-                            </span>
-                          </div>
-
-                          <p className="mt-1 truncate text-xs text-slate-400">
-                            {displayId}
-                          </p>
-                        </div>
-
-                        <span
-                          className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${statusClass}`}
-                        >
-                          {status}
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+      {/* Contextual back link */}
+      {backNavigation && (
+        <div className="border-b border-slate-200 bg-white px-5 py-4 md:px-8">
+          <Link
+            href={backNavigation.href}
+            className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
+          >
+            ← {backNavigation.label}
+          </Link>
         </div>
-      </section>
-    </main>
+      )}
+    </>
   );
 }

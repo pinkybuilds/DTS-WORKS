@@ -61,14 +61,14 @@ export default function AppNavigation() {
   return (
     <>
       {/* Main navigation / hero */}
-      <header className="relative z-50 w-full border-b border-slate-300 bg-[#173A5E]">
+      <header className="relative z-50 w-full border-b border-slate-300 bg-[#0f172a]">
         <div className="flex h-[76px] items-center justify-between px-5 md:px-8">
           {/* Logo */}
           <div className="flex items-center">
             <img
               src="/branding/dts works logo real.png"
               alt="DTS Works"
-              className="h-9 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
           </div>
 
