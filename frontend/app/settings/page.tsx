@@ -1,3 +1,4 @@
+ 
 "use client";
 
 import { useEffect, useState } from "react";
@@ -44,24 +45,25 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-6 py-8">
+    <main className="min-h-screen bg-slate-50 px-5 pb-10 pt-7 md:px-10 md:pb-12 md:pt-8">
       <div className="mx-auto max-w-4xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-slate-900">
-            Settings
-          </h1>
+        {/* Main settings form */}
+        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-white">
+          {/* Header */}
+          <div className="px-6 py-6 md:px-8 md:py-7">
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
+              Settings
+            </h1>
 
-          <p className="mt-1 text-sm text-slate-600">
-            Manage your account and application preferences.
-          </p>
-        </div>
+            <p className="mt-2 text-slate-600">
+              Manage your account and application preferences.
+            </p>
+          </div>
 
-        <div className="space-y-6">
           {/* Account */}
-          <section className="rounded-xl border border-slate-200 bg-white p-6">
-            <div className="mb-5">
-              <h2 className="text-base font-semibold text-slate-900">
+          <section className="border-t border-slate-200 px-6 py-7 md:px-8">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-slate-900">
                 Account
               </h2>
 
@@ -70,7 +72,7 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
                 <p className="text-sm font-medium text-slate-700">
                   Name
@@ -86,7 +88,7 @@ export default function SettingsPage() {
                   Email
                 </p>
 
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 break-words text-sm text-slate-500">
                   {email}
                 </p>
               </div>
@@ -94,9 +96,9 @@ export default function SettingsPage() {
           </section>
 
           {/* Preferences */}
-          <section className="rounded-xl border border-slate-200 bg-white p-6">
-            <div className="mb-5">
-              <h2 className="text-base font-semibold text-slate-900">
+          <section className="border-t border-slate-200 px-6 py-7 md:px-8">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-slate-900">
                 Preferences
               </h2>
 
@@ -106,7 +108,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="flex items-center justify-between gap-6">
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm font-medium text-slate-700">
                   Email notifications
                 </p>
@@ -142,9 +144,9 @@ export default function SettingsPage() {
           </section>
 
           {/* Application */}
-          <section className="rounded-xl border border-slate-200 bg-white p-6">
-            <div className="mb-5">
-              <h2 className="text-base font-semibold text-slate-900">
+          <section className="border-t border-slate-200 px-6 py-7 md:px-8">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-slate-900">
                 Application
               </h2>
 
@@ -153,8 +155,8 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            <div className="divide-y divide-slate-100">
-              <div className="flex items-center justify-between py-3 first:pt-0">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-6">
                 <span className="text-sm font-medium text-slate-700">
                   Version
                 </span>
@@ -164,7 +166,7 @@ export default function SettingsPage() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-3 last:pb-0">
+              <div className="flex items-center justify-between gap-6">
                 <span className="text-sm font-medium text-slate-700">
                   Environment
                 </span>
@@ -177,10 +179,10 @@ export default function SettingsPage() {
           </section>
 
           {/* Sign out */}
-          <section className="rounded-xl border border-slate-200 bg-white p-6">
-            <div className="flex items-center justify-between gap-6">
+          <section className="border-t border-slate-200 px-6 py-7 md:px-8">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-base font-semibold text-slate-900">
+                <h2 className="text-lg font-semibold text-slate-900">
                   Sign out
                 </h2>
 
@@ -193,9 +195,11 @@ export default function SettingsPage() {
                 type="button"
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400/40 disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-fit rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400/40 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isSigningOut ? "Signing out..." : "Sign out"}
+                {isSigningOut
+                  ? "Signing out..."
+                  : "Sign out"}
               </button>
             </div>
 
@@ -210,6 +214,6 @@ export default function SettingsPage() {
           </section>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

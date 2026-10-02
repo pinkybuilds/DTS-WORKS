@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 
@@ -18,6 +19,7 @@ type SiteProfile = {
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
 export default function SiteProfilePage() {
   const [profile, setProfile] = useState<SiteProfile>({
     organisation_name: "",
@@ -77,7 +79,7 @@ export default function SiteProfilePage() {
 
   function updateProfile(
     field: keyof SiteProfile,
-    value: string
+    value: string,
   ) {
     setProfile((current) => ({
       ...current,
@@ -89,7 +91,7 @@ export default function SiteProfilePage() {
 
   function updateAddress(
     field: "full_address" | "postcode",
-    value: string
+    value: string,
   ) {
     setProfile((current) => ({
       ...current,
@@ -129,7 +131,7 @@ export default function SiteProfilePage() {
         const errorData = await response.json().catch(() => null);
 
         throw new Error(
-          errorData?.detail || "Failed to save Site Profile."
+          errorData?.detail || "Failed to save Site Profile.",
         );
       }
 
@@ -143,7 +145,7 @@ export default function SiteProfilePage() {
       setError(
         err instanceof Error
           ? err.message
-          : "We couldn't save your Site Profile."
+          : "We couldn't save your Site Profile.",
       );
     } finally {
       setSaving(false);
@@ -153,20 +155,33 @@ export default function SiteProfilePage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-50 text-slate-900">
-        <section className="flex-1">
-          <header className="border-b border-slate-200 bg-white px-8 py-6">
-            <h1 className="text-2xl font-semibold">
-              Site Profile
-            </h1>
+        <section className="w-full">
+          <div className="px-5 pb-10 pt-7 md:px-10 md:pb-12 md:pt-8">
+            {/* Back to dashboard */}
+            <div className="mb-6">
+              <Link
+                href="/"
+                className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
+              >
+                ← Dashboard
+              </Link>
+            </div>
 
-            <p className="mt-1 text-sm text-slate-500">
-              Loading your receiving site details...
-            </p>
-          </header>
+            {/* Page heading */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-semibold tracking-tight">
+                Site Profile
+              </h1>
 
-          <div className="p-8">
-            <div className="rounded-xl border border-slate-200 bg-white p-6">
-              Loading...
+              <p className="mt-2 text-slate-600">
+                Loading your receiving site details...
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-8">
+              <p className="text-sm text-slate-500">
+                Loading...
+              </p>
             </div>
           </div>
         </section>
@@ -176,18 +191,29 @@ export default function SiteProfilePage() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      <section className="flex-1">
-        <header className="border-b border-slate-200 bg-white px-8 py-6">
-          <h1 className="text-2xl font-semibold">
-            Site Profile
-          </h1>
+      <section className="w-full">
+        <div className="mx-auto max-w-4xl px-5 pb-10 pt-7 md:px-10 md:pb-12 md:pt-8">
+          {/* Back to dashboard */}
+          <div className="mb-6">
+            <Link
+              href="/"
+              className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
+            >
+              ← Dashboard
+            </Link>
+          </div>
 
-          <p className="mt-1 text-sm text-slate-500">
-            Manage the receiving site details used by DTS Works.
-          </p>
-        </header>
+          {/* Page heading */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Site Profile
+            </h1>
 
-        <div className="mx-auto max-w-4xl p-8">
+            <p className="mt-2 text-slate-600">
+              Manage the receiving site details used by DTS Works.
+            </p>
+          </div>
+
           {error && (
             <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
               {error}
@@ -200,8 +226,9 @@ export default function SiteProfilePage() {
             </div>
           )}
 
-          <div className="space-y-6">
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
+          <div className="space-y-4">
+            {/* Organisation */}
+            <section className="rounded-2xl border border-slate-800 bg-white p-6">
               <div>
                 <h2 className="text-lg font-semibold">
                   Organisation
@@ -224,7 +251,7 @@ export default function SiteProfilePage() {
                     onChange={(event) =>
                       updateProfile(
                         "organisation_name",
-                        event.target.value
+                        event.target.value,
                       )
                     }
                     className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
@@ -242,7 +269,7 @@ export default function SiteProfilePage() {
                     onChange={(event) =>
                       updateProfile(
                         "site_name",
-                        event.target.value
+                        event.target.value,
                       )
                     }
                     className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
@@ -251,7 +278,8 @@ export default function SiteProfilePage() {
               </div>
             </section>
 
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
+            {/* Site address */}
+            <section className="rounded-2xl border border-slate-800 bg-white p-6">
               <div>
                 <h2 className="text-lg font-semibold">
                   Site address
@@ -273,7 +301,7 @@ export default function SiteProfilePage() {
                     onChange={(event) =>
                       updateAddress(
                         "full_address",
-                        event.target.value
+                        event.target.value,
                       )
                     }
                     rows={3}
@@ -292,7 +320,7 @@ export default function SiteProfilePage() {
                     onChange={(event) =>
                       updateAddress(
                         "postcode",
-                        event.target.value
+                        event.target.value,
                       )
                     }
                     className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
@@ -301,7 +329,8 @@ export default function SiteProfilePage() {
               </div>
             </section>
 
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
+            {/* Authorisation */}
+            <section className="rounded-2xl border border-slate-800 bg-white p-6">
               <div>
                 <h2 className="text-lg font-semibold">
                   Authorisation
@@ -324,7 +353,7 @@ export default function SiteProfilePage() {
                     onChange={(event) =>
                       updateProfile(
                         "authorisation_number",
-                        event.target.value
+                        event.target.value,
                       )
                     }
                     className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
@@ -342,7 +371,7 @@ export default function SiteProfilePage() {
                     onChange={(event) =>
                       updateProfile(
                         "api_code",
-                        event.target.value
+                        event.target.value,
                       )
                     }
                     className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
@@ -351,7 +380,8 @@ export default function SiteProfilePage() {
               </div>
             </section>
 
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
+            {/* Contact details */}
+            <section className="rounded-2xl border border-slate-800 bg-white p-6">
               <div>
                 <h2 className="text-lg font-semibold">
                   Contact details
@@ -374,7 +404,7 @@ export default function SiteProfilePage() {
                     onChange={(event) =>
                       updateProfile(
                         "email_address",
-                        event.target.value
+                        event.target.value,
                       )
                     }
                     className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
@@ -392,7 +422,7 @@ export default function SiteProfilePage() {
                     onChange={(event) =>
                       updateProfile(
                         "phone_number",
-                        event.target.value
+                        event.target.value,
                       )
                     }
                     className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500"
@@ -401,7 +431,8 @@ export default function SiteProfilePage() {
               </div>
             </section>
 
-            <div className="flex items-center justify-end gap-4">
+            {/* Save */}
+            <div className="flex items-center justify-end gap-4 pt-2">
               {saved && (
                 <span className="text-sm text-slate-500">
                   Changes saved
@@ -412,7 +443,7 @@ export default function SiteProfilePage() {
                 type="button"
                 onClick={saveSiteProfile}
                 disabled={saving}
-                className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl bg-[#0f172a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {saving ? "Saving..." : "Save Site Profile"}
               </button>
