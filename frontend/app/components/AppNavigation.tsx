@@ -68,7 +68,7 @@ export default function AppNavigation() {
             <img
               src="/branding/dts works logo real.png"
               alt="DTS Works"
-              className="h-25 w-auto object-contain"
+              className="h-45 w-auto object-contain"
             />
           </div>
 
