@@ -18,7 +18,8 @@ type OnboardingErrorType =
 const TERMS_VERSION = "TOS-2026-09-28";
 const PRIVACY_POLICY_VERSION = "PRIVACY-2026-09-28";
 const ONBOARDING_DRAFT_KEY = "dts-works-onboarding-draft";
-
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 export default function OnboardingPage() {
   const router = useRouter();
 
@@ -271,7 +272,7 @@ export default function OnboardingPage() {
 
       try {
         response = await fetch(
-          "http://127.0.0.1:8000/onboarding",
+          `${API_BASE_URL}/onboarding`,
           {
             method: "POST",
             headers: {

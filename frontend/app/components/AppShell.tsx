@@ -5,6 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import AppNavigation from "./AppNavigation";
 import { supabase } from "@/lib/supabase/client";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
 export default function AppShell({
   children,
 }: {
@@ -53,15 +56,15 @@ export default function AppShell({
       }
 
       try {
+        const session = await supabase.auth.getSession();
+
         const response = await fetch(
-          "http://127.0.0.1:8000/site-profile",
+          `${API_BASE_URL}/site-profile`,
           {
             method: "GET",
             headers: {
               Authorization: `Bearer ${
-                (
-                  await supabase.auth.getSession()
-                ).data.session?.access_token ?? ""
+                session.data.session?.access_token ?? ""
               }`,
             },
           },
@@ -77,15 +80,9 @@ export default function AppShell({
           return;
         }
 
-        if (response.status === 404) {
-          setIsRedirecting(true);
-          router.replace("/onboarding");
-          return;
-        }
-
         if (!response.ok) {
           console.error(
-            "Unable to verify onboarding status:",
+            "Unable to verify site profile:",
             response.status,
           );
 
@@ -136,5 +133,4 @@ export default function AppShell({
     </div>
   );
 }
-
 
