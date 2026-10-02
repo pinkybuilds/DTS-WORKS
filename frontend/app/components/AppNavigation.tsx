@@ -61,7 +61,7 @@ export default function AppNavigation() {
   return (
     <>
       {/* Main navigation */}
-      <header className="w-full border-b border-slate-200 bg-white">
+      <header className="relative z-50 w-full border-b border-slate-200 bg-white">
         <div className="flex h-16 items-center justify-between px-5 md:px-8">
           {/* Logo */}
           <div className="flex flex-col items-start">
@@ -93,11 +93,22 @@ export default function AppNavigation() {
             </span>
           </button>
         </div>
+      </header>
 
-        {/* Navigation menu */}
-        {menuOpen && (
-          <nav className="border-t border-slate-200 px-5 py-4 md:px-8">
-            <div className="mx-auto max-w-7xl space-y-1">
+      {/* Navigation drawer */}
+      {menuOpen && (
+        <>
+          {/* Backdrop */}
+          <button
+            type="button"
+            aria-label="Close navigation"
+            onClick={() => setMenuOpen(false)}
+            className="fixed inset-0 z-40 bg-black/10"
+          />
+
+          {/* Drawer */}
+          <nav className="fixed right-0 top-16 z-50 w-72 max-w-[85vw] border-l border-b border-slate-200 bg-white p-4 shadow-xl">
+            <div className="space-y-1">
               {navigationItems.map((item) => {
                 const isActive =
                   pathname === item.href ||
@@ -121,8 +132,8 @@ export default function AppNavigation() {
               })}
             </div>
           </nav>
-        )}
-      </header>
+        </>
+      )}
 
       {/* Contextual back link */}
       {backNavigation && (
