@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -98,44 +99,43 @@ export default function ReceiptsPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      <section className="flex-1">
-
-        {/* Header */}
-        <header className="border-b border-slate-200 bg-white px-6 py-5 md:px-10">
-          <div className="flex items-center justify-between">
-
-            <h1 className="text-lg font-semibold">
-              Receipts
-            </h1>
-
-            <Link
-              href="/receipts/new-receipt"
-              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
-            >
-              + New waste receipt
-            </Link>
-
-          </div>
-        </header>
-
-        {/* Page content */}
-        <div className="px-6 py-10 md:px-10">
-
+      <section className="w-full">
+        <div className="px-5 py-8 md:px-10 md:py-10">
+          {/* Page heading */}
           <div className="mb-8">
-            <h2 className="text-3xl font-semibold tracking-tight">
-              Waste receipts
-            </h2>
+            <div className="mb-6">
+              <Link
+                href="/"
+                className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
+              >
+                ← Dashboard
+              </Link>
+            </div>
 
-            <p className="mt-2 text-slate-600">
-              View and manage waste movements recorded through DTS Works.
-            </p>
+            <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h1 className="text-3xl font-semibold tracking-tight">
+                  Waste receipts
+                </h1>
+
+                <p className="mt-2 max-w-2xl text-slate-600">
+                  View and manage waste movements recorded through DTS Works.
+                </p>
+              </div>
+
+              <Link
+                href="/receipts/new-receipt"
+                className="inline-flex w-fit items-center justify-center rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
+              >
+                + New waste receipt
+              </Link>
+            </div>
           </div>
 
           {/* Receipt list */}
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-
-            {/* Table header */}
-            <div className="grid grid-cols-5 border-b border-slate-200 bg-slate-50 px-6 py-4 text-sm font-medium text-slate-600">
+            {/* Desktop table header */}
+            <div className="hidden grid-cols-5 border-b border-slate-200 bg-slate-50 px-6 py-4 text-sm font-medium text-slate-600 md:grid">
               <div>Receipt ID</div>
               <div>Date</div>
               <div>Waste</div>
@@ -187,46 +187,109 @@ export default function ReceiptsPage() {
                   const ewc =
                     firstWasteItem?.ewc_codes?.[0] || "—";
 
+                  const receiptId =
+                    receipt.waste_tracking_id || receipt.id;
+
                   return (
                     <Link
                       key={receipt.id}
                       href={`/receipts/${receipt.id}`}
-                      className="grid grid-cols-5 items-center border-b border-slate-100 px-6 py-5 text-sm transition hover:bg-slate-50 last:border-b-0"
+                      className="block border-b border-slate-100 transition last:border-b-0 hover:bg-slate-50"
                     >
-                      <div className="font-medium text-slate-900">
-                        {receipt.waste_tracking_id || receipt.id}
+                      {/* Desktop row */}
+                      <div className="hidden grid-cols-5 items-center px-6 py-5 text-sm md:grid">
+                        <div className="min-w-0 pr-4 font-medium text-slate-900">
+                          <span className="block truncate">
+                            {receiptId}
+                          </span>
+                        </div>
+
+                        <div className="whitespace-nowrap text-slate-600">
+                          {formatDate(receipt.date_time_received)}
+                        </div>
+
+                        <div className="min-w-0 pr-4 text-slate-700">
+                          <span className="block truncate">
+                            {wasteDescription}
+                          </span>
+                        </div>
+
+                        <div className="whitespace-nowrap text-slate-600">
+                          {ewc}
+                        </div>
+
+                        <div
+                          className={`font-medium ${getStatusClasses(
+                            receipt,
+                          )}`}
+                        >
+                          {getStatusLabel(receipt)}
+                        </div>
                       </div>
 
-                      <div className="text-slate-600">
-                        {formatDate(receipt.date_time_received)}
-                      </div>
+                      {/* Mobile card */}
+                      <div className="space-y-4 px-5 py-5 md:hidden">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                              Receipt ID
+                            </p>
 
-                      <div className="truncate pr-4 text-slate-700">
-                        {wasteDescription}
-                      </div>
+                            <p className="mt-1 break-all text-sm font-medium text-slate-900">
+                              {receiptId}
+                            </p>
+                          </div>
 
-                      <div className="text-slate-600">
-                        {ewc}
-                      </div>
+                          <div
+                            className={`shrink-0 text-sm font-medium ${getStatusClasses(
+                              receipt,
+                            )}`}
+                          >
+                            {getStatusLabel(receipt)}
+                          </div>
+                        </div>
 
-                      <div
-                        className={`font-medium ${getStatusClasses(
-                          receipt,
-                        )}`}
-                      >
-                        {getStatusLabel(receipt)}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                              Date
+                            </p>
+
+                            <p className="mt-1 text-sm text-slate-700">
+                              {formatDate(receipt.date_time_received)}
+                            </p>
+                          </div>
+
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                              EWC
+                            </p>
+
+                            <p className="mt-1 text-sm text-slate-700">
+                              {ewc}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                            Waste
+                          </p>
+
+                          <p className="mt-1 break-words text-sm text-slate-700">
+                            {wasteDescription}
+                          </p>
+                        </div>
                       </div>
                     </Link>
                   );
                 })}
               </div>
             )}
-
           </div>
-
         </div>
-
       </section>
     </main>
   );
 }
+
