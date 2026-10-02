@@ -1,0 +1,889 @@
+{
+  "H200": {
+    "description": "Unstable explosives.",
+    "rules": [
+      {
+        "hazard_classification": "Unst. Expl.",
+        "threshold_reference": "See Appendix C1",
+        "hazardous_properties": ["HP1"]
+      }
+    ]
+  },
+
+  "H201": {
+    "description": "Explosive; mass explosion hazard.",
+    "rules": [
+      {
+        "hazard_classification": "Div. 1.1",
+        "threshold_reference": "See Appendix C1",
+        "hazardous_properties": ["HP1"]
+      }
+    ]
+  },
+
+  "H202": {
+    "description": "Explosive; severe projection hazard.",
+    "rules": [
+      {
+        "hazard_classification": "Div. 1.2",
+        "threshold_reference": "See Appendix C1",
+        "hazardous_properties": ["HP1"]
+      }
+    ]
+  },
+
+  "H203": {
+    "description": "Explosive; severe blast hazard.",
+    "rules": [
+      {
+        "hazard_classification": "Div. 1.3",
+        "threshold_reference": "See Appendix C1",
+        "hazardous_properties": ["HP1"]
+      }
+    ]
+  },
+
+  "H204": {
+    "description": "Fire or projection hazard.",
+    "rules": [
+      {
+        "hazard_classification": "Div. 1.4",
+        "threshold_reference": "See Appendix C1",
+        "hazardous_properties": ["HP1"]
+      }
+    ]
+  },
+
+  "H205": {
+    "description": "May mass explode in fire.",
+    "rules": [
+      {
+        "hazard_classification": "n/a",
+        "threshold_reference": "See Appendix C1 & C15",
+        "hazardous_properties": ["HP1", "HP15"]
+      }
+    ]
+  },
+
+  "H220": {
+    "description": "Extremely flammable gas.",
+    "rules": [
+      {
+        "hazard_classification": "Flam. Gas 1",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H221": {
+    "description": "Flammable gas.",
+    "rules": [
+      {
+        "hazard_classification": "Flam. Gas 2",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H222": {
+    "description": "Extremely flammable aerosol.",
+    "rules": [
+      {
+        "hazard_classification": "Aerosol 1",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H223": {
+    "description": "Flammable aerosol.",
+    "rules": [
+      {
+        "hazard_classification": "Aerosol 2",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H224": {
+    "description": "Extremely flammable liquid and vapour.",
+    "rules": [
+      {
+        "hazard_classification": "Flam. Liq. 1",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H225": {
+    "description": "Highly flammable liquid and vapour.",
+    "rules": [
+      {
+        "hazard_classification": "Flam. Liq. 2",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H226": {
+    "description": "Flammable liquid and vapour.",
+    "rules": [
+      {
+        "hazard_classification": "Flam. Liq. 3",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H228": {
+    "description": "Flammable solid.",
+    "rules": [
+      {
+        "hazard_classification": "Flam. Sol. 1, 2",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H230": {
+    "description": "May react explosively even in the absence of air.",
+    "rules": [
+      {
+        "hazard_classification": "n/a",
+        "threshold_reference": "n/a",
+        "hazardous_properties": []
+      }
+    ]
+  },
+
+  "H231": {
+    "description": "May react explosively even in the absence of air at elevated pressure and/or temperature.",
+    "rules": [
+      {
+        "hazard_classification": "n/a",
+        "threshold_reference": "n/a",
+        "hazardous_properties": []
+      }
+    ]
+  },
+
+  "H240": {
+    "description": "Heating may cause an explosion.",
+    "rules": [
+      {
+        "hazard_classification": "Self-React. A / Org. Perox. A",
+        "threshold_reference": "See Appendices C1 & C3",
+        "hazardous_properties": ["HP1", "HP3"]
+      }
+    ]
+  },
+
+  "H241": {
+    "description": "Heating may cause a fire or explosion.",
+    "rules": [
+      {
+        "hazard_classification": "Self-React. B / Org. Perox. B",
+        "threshold_reference": "See Appendices C1 & C3",
+        "hazardous_properties": ["HP1", "HP3"]
+      }
+    ]
+  },
+
+  "H242": {
+    "description": "Heating may cause a fire.",
+    "rules": [
+      {
+        "hazard_classification": "Self-React. C, D, E, F / Org. Perox. C, D, E, F",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H250": {
+    "description": "Catches fire spontaneously if exposed to air.",
+    "rules": [
+      {
+        "hazard_classification": "Pyr. Liq. 1 / Pyr. Sol. 1",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H251": {
+    "description": "Self-heating; may catch fire.",
+    "rules": [
+      {
+        "hazard_classification": "Self-heat. 1",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H252": {
+    "description": "Self-heating in large quantities; may catch fire.",
+    "rules": [
+      {
+        "hazard_classification": "Self-heat. 2",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H260": {
+    "description": "In contact with water releases flammable gases which may ignite spontaneously.",
+    "rules": [
+      {
+        "hazard_classification": "Water-react. 1",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H261": {
+    "description": "In contact with water releases flammable gases.",
+    "rules": [
+      {
+        "hazard_classification": "Water-react. 2",
+        "threshold_reference": "See Appendix C3",
+        "hazardous_properties": ["HP3"]
+      }
+    ]
+  },
+
+  "H270": {
+    "description": "May cause or intensify fire; oxidiser.",
+    "rules": [
+      {
+        "hazard_classification": "Ox. Gas 1",
+        "threshold_reference": "See Appendix C2",
+        "hazardous_properties": ["HP2"]
+      }
+    ]
+  },
+
+  "H271": {
+    "description": "May cause fire or explosion; strong oxidiser.",
+    "rules": [
+      {
+        "hazard_classification": "Ox. Sol. 1",
+        "threshold_reference": "See Appendix C2",
+        "hazardous_properties": ["HP2"]
+      }
+    ]
+  },
+
+  "H272": {
+    "description": "May intensify fire; oxidiser.",
+    "rules": [
+      {
+        "hazard_classification": "Ox. Sol. 2, 3",
+        "threshold_reference": "See Appendix C2",
+        "hazardous_properties": ["HP2"]
+      }
+    ]
+  },
+
+  "H280": {
+    "description": "Contains gas under pressure; may explode if heated.",
+    "rules": [
+      {
+        "hazard_classification": "n/a",
+        "threshold_reference": "n/a",
+        "hazardous_properties": []
+      }
+    ]
+  },
+
+  "H281": {
+    "description": "Contains refrigerated gas; may cause cryogenic burns or injury.",
+    "rules": [
+      {
+        "hazard_classification": "n/a",
+        "threshold_reference": "n/a",
+        "hazardous_properties": []
+      }
+    ]
+  },
+
+  "H290": {
+    "description": "May be corrosive to metals.",
+    "rules": [
+      {
+        "hazard_classification": "Met. Corr. 1",
+        "threshold_reference": "n/a",
+        "hazardous_properties": []
+      }
+    ]
+  },
+
+  "H300": {
+    "description": "Fatal if swallowed.",
+    "rules": [
+      {
+        "hazard_classification": "Acute Tox. 1",
+        "threshold_reference": "Sum (0.1%)",
+        "hazardous_properties": ["HP6"]
+      }
+    ]
+  },
+
+  "H301": {
+    "description": "Toxic if swallowed.",
+    "rules": [
+      {
+        "hazard_classification": "Acute Tox. 3",
+        "threshold_reference": "Sum (5%)",
+        "hazardous_properties": ["HP6"]
+      }
+    ]
+  },
+
+  "H302": {
+    "description": "Harmful if swallowed.",
+    "rules": [
+      {
+        "hazard_classification": "Acute Tox. 4",
+        "threshold_reference": "Sum (25%)",
+        "hazardous_properties": ["HP6"]
+      }
+    ]
+  },
+
+  "H304": {
+    "description": "May be fatal if swallowed and enters airways.",
+    "rules": [
+      {
+        "hazard_classification": "Asp. Tox. 1",
+        "threshold_reference": "Sum (10%)",
+        "hazardous_properties": ["HP5"]
+      }
+    ]
+  },
+
+  "H310": {
+    "description": "Fatal in contact with skin.",
+    "rules": [
+      {
+        "hazard_classification": "Acute Tox. 2",
+        "threshold_reference": "Sum (0.25%)",
+        "hazardous_properties": ["HP6"]
+      }
+    ]
+  },
+
+  "H311": {
+    "description": "Toxic in contact with skin.",
+    "rules": [
+      {
+        "hazard_classification": "Acute Tox. 3",
+        "threshold_reference": "Sum (15%)",
+        "hazardous_properties": ["HP6"]
+      }
+    ]
+  },
+
+  "H312": {
+    "description": "Harmful in contact with skin.",
+    "rules": [
+      {
+        "hazard_classification": "Acute Tox. 4",
+        "threshold_reference": "Sum (55%)",
+        "hazardous_properties": ["HP6"]
+      }
+    ]
+  },
+
+  "H314": {
+    "description": "Causes severe skin burns and eye damage.",
+    "rules": [
+      {
+        "hazard_classification": "Skin Corr. 1A",
+        "threshold": {
+          "type": "sum",
+          "value": 1,
+          "unit": "%"
+        },
+        "threshold_reference": "Sum (1%)",
+        "hazardous_properties": ["HP4", "HP8"]
+      },
+      {
+        "hazard_classification": "Skin Corr. 1B, 1C",
+        "threshold": {
+          "type": "sum",
+          "value": 5,
+          "unit": "%"
+        },
+        "threshold_reference": "Sum (5%)",
+        "hazardous_properties": ["HP8"]
+      }
+    ]
+  },
+
+  "H315": {
+    "description": "Causes skin irritation.",
+    "rules": [
+      {
+        "hazard_classification": "Skin Irrit. 2",
+        "threshold_reference": "See Appendix C4",
+        "hazardous_properties": ["HP4"]
+      }
+    ]
+  },
+
+  "H317": {
+    "description": "May cause an allergic skin reaction.",
+    "rules": [
+      {
+        "hazard_classification": "Skin Sens. 1",
+        "threshold_reference": "Ind. 10%",
+        "hazardous_properties": ["HP13"]
+      }
+    ]
+  },
+
+  "H318": {
+    "description": "Causes serious eye damage.",
+    "rules": [
+      {
+        "hazard_classification": "Eye Dam. 1",
+        "threshold_reference": "Sum (10%)",
+        "hazardous_properties": ["HP4"]
+      }
+    ]
+  },
+
+  "H319": {
+    "description": "Causes serious eye irritation.",
+    "rules": [
+      {
+        "hazard_classification": "Eye Irrit. 2",
+        "threshold_reference": "See Appendix C4",
+        "hazardous_properties": ["HP4"]
+      }
+    ]
+  },
+
+  "H330": {
+    "description": "Fatal if inhaled.",
+    "rules": [
+      {
+        "hazard_classification": "Acute Tox. 1",
+        "threshold": {
+          "type": "sum",
+          "value": 0.1,
+          "unit": "%"
+        },
+        "threshold_reference": "Sum (0.1%)",
+        "hazardous_properties": ["HP6"]
+      },
+      {
+        "hazard_classification": "Acute Tox. 2",
+        "threshold": {
+          "type": "sum",
+          "value": 0.5,
+          "unit": "%"
+        },
+        "threshold_reference": "Sum (0.5%)",
+        "hazardous_properties": ["HP6"]
+      }
+    ]
+  },
+
+  "H331": {
+    "description": "Toxic if inhaled.",
+    "rules": [
+      {
+        "hazard_classification": "Acute Tox. 3",
+        "threshold_reference": "Sum (3.5%)",
+        "hazardous_properties": ["HP6"]
+      }
+    ]
+  },
+
+  "H332": {
+    "description": "Harmful if inhaled.",
+    "rules": [
+      {
+        "hazard_classification": "Acute Tox. 4",
+        "threshold_reference": "Sum (22.5%)",
+        "hazardous_properties": ["HP6"]
+      }
+    ]
+  },
+
+  "H334": {
+    "description": "May cause allergy or asthma symptoms or breathing difficulties if inhaled.",
+    "rules": [
+      {
+        "hazard_classification": "Resp. Sens. 1",
+        "threshold_reference": "Ind. 10%",
+        "hazardous_properties": ["HP13"]
+      }
+    ]
+  },
+
+  "H335": {
+    "description": "May cause respiratory irritation.",
+    "rules": [
+      {
+        "hazard_classification": "STOT SE 3",
+        "threshold_reference": "Ind. 20%",
+        "hazardous_properties": ["HP5"]
+      }
+    ]
+  },
+
+  "H336": {
+    "description": "May cause drowsiness or dizziness.",
+    "rules": [
+      {
+        "hazard_classification": "STOT SE 3",
+        "threshold_reference": "n/a",
+        "hazardous_properties": []
+      }
+    ]
+  },
+
+  "H340": {
+    "description": "May cause genetic defects",
+    "rules": [
+      {
+        "hazard_classification": "Muta. 1A, 1B",
+        "threshold_reference": "Ind. 0.1%",
+        "hazardous_properties": ["HP11"]
+      }
+    ]
+  },
+
+  "H341": {
+    "description": "Suspected of causing genetic defects",
+    "rules": [
+      {
+        "hazard_classification": "Muta. 2",
+        "threshold_reference": "Ind. 1%",
+        "hazardous_properties": ["HP11"]
+      }
+    ]
+  },
+
+  "H350": {
+    "description": "May cause cancer",
+    "rules": [
+      {
+        "hazard_classification": "Carc. 1A, 1B",
+        "threshold_reference": "Ind. 0.1%",
+        "hazardous_properties": ["HP7"]
+      }
+    ]
+  },
+
+  "H351": {
+    "description": "Suspected of causing cancer",
+    "rules": [
+      {
+        "hazard_classification": "Carc. 2",
+        "threshold_reference": "Ind. 1.0%",
+        "hazardous_properties": ["HP7"]
+      }
+    ]
+  },
+
+"H360(1)": {
+  "description": "May damage fertility or the unborn child",
+  "rules": [
+    {
+      "hazard_classification": "Repr. 1A, 1B",
+      "threshold_reference": "Ind. 0.3%",
+      "hazardous_properties": ["HP10"]
+    }
+  ]
+},
+
+"H361(1)": {
+  "description": "Suspected of damaging fertility or the unborn child",
+  "rules": [
+    {
+      "hazard_classification": "Repr. 2",
+      "threshold_reference": "Ind. 3%",
+      "hazardous_properties": ["HP10"]
+    }
+  ]
+},
+
+"H362": {
+  "description": "May cause harm to breast-fed children.",
+  "rules": [
+    {
+      "hazard_classification": "Lact.",
+      "threshold_reference": "n/a",
+      "hazardous_properties": []
+    }
+  ]
+},
+
+"H370": {
+  "description": "Causes damage to organs",
+  "rules": [
+    {
+      "hazard_classification": "STOT SE 1",
+      "threshold_reference": "Ind. 1%",
+      "hazardous_properties": ["HP5"]
+    }
+  ]
+},
+
+"H371": {
+  "description": "May cause damage to organs",
+  "rules": [
+    {
+      "hazard_classification": "STOT SE 2",
+      "threshold_reference": "Ind. 10%",
+      "hazardous_properties": ["HP5"]
+    }
+  ]
+},
+
+"H372": {
+  "description": "Causes damage to organs",
+  "rules": [
+    {
+      "hazard_classification": "STOT RE 1",
+      "threshold_reference": "Ind. 1%",
+      "hazardous_properties": ["HP5"]
+    }
+  ]
+},
+
+"H373": {
+  "description": "May cause damage to organs",
+  "rules": [
+    {
+      "hazard_classification": "STOT RE 2",
+      "threshold_reference": "Ind. 10%",
+      "hazardous_properties": ["HP5"]
+    }
+  ]
+},
+
+"H400": {
+  "description": "Very toxic to aquatic life.",
+  "rules": [
+    {
+      "hazard_classification": "Aquatic Acute 1",
+      "threshold_reference": "See Appendix C14",
+      "hazardous_properties": ["HP14"]
+    }
+  ]
+},
+
+"H410": {
+  "description": "Very toxic to aquatic life with long lasting effects.",
+  "rules": [
+    {
+      "hazard_classification": "Aquatic Chronic 1",
+      "threshold_reference": "See Appendix C14",
+      "hazardous_properties": ["HP14"]
+    }
+  ]
+},
+
+"H411": {
+  "description": "Toxic to aquatic life with long lasting effects.",
+  "rules": [
+    {
+      "hazard_classification": "Aquatic Chronic 2",
+      "threshold_reference": "See Appendix C14",
+      "hazardous_properties": ["HP14"]
+    }
+  ]
+},
+
+"H412": {
+  "description": "Harmful to aquatic life with long lasting effects.",
+  "rules": [
+    {
+      "hazard_classification": "Aquatic Chronic 3",
+      "threshold_reference": "See Appendix C14",
+      "hazardous_properties": ["HP14"]
+    }
+  ]
+},
+
+"H413": {
+  "description": "May cause long lasting harmful effects to aquatic life.",
+  "rules": [
+    {
+      "hazard_classification": "Aquatic Chronic 4",
+      "threshold_reference": "See Appendix C14",
+      "hazardous_properties": ["HP14"]
+    }
+  ]
+},
+
+"H420": {
+  "description": "Harms public health and the environment by destroying ozone in the upper atmosphere",
+  "rules": [
+    {
+      "hazard_classification": "Ozone 1",
+      "threshold_reference": "See Appendix C15",
+      "hazardous_properties": ["HP15"]
+    }
+  ]
+},
+
+"EUH 001(3)": {
+  "description": "Explosive when dry.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "n/a",
+      "hazardous_properties": []
+    }
+  ]
+},
+
+"EUH 006(3)": {
+  "description": "Explosive with or without contact with air.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "n/a",
+      "hazardous_properties": []
+    }
+  ]
+},
+
+"EUH 014(3)": {
+  "description": "Reacts violently with water.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "n/a",
+      "hazardous_properties": []
+    }
+  ]
+},
+
+"EUH 018(3)": {
+  "description": "In use may form flammable/explosive vapour-air mixture.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "n/a",
+      "hazardous_properties": []
+    }
+  ]
+},
+
+"EUH 019(3)": {
+  "description": "May form explosive peroxides.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "See Appendix C15",
+      "hazardous_properties": ["HP15"]
+    }
+  ]
+},
+
+"EUH 029(3)": {
+  "description": "Contact with water liberates toxic gas.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "See Appendix C12",
+      "hazardous_properties": ["HP12"]
+    }
+  ]
+}
+,
+"EUH 031(3)": {
+  "description": "Contact with acids liberates toxic gas.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "See Appendix C12",
+      "hazardous_properties": ["HP12"]
+    }
+  ]
+},
+
+"EUH 032(3)": {
+  "description": "Contact with acids liberates very toxic gas.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "See Appendix C12",
+      "hazardous_properties": ["HP12"]
+    }
+  ]
+},
+
+"EUH 044(3)": {
+  "description": "Risk of explosion if heated under confinement.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "See Appendix C15",
+      "hazardous_properties": ["HP15"]
+    }
+  ]
+},
+
+"(EUH 059)": {
+  "description": "Replaced by H420",
+  "rules": [
+    {
+      "hazard_classification": "See H420",
+      "threshold_reference": "See H420",
+      "hazardous_properties": ["HP14"]
+    }
+  ]
+},
+
+"EUH 066(3)": {
+  "description": "Repeated exposure may cause skin dryness or cracking.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "n/a",
+      "hazardous_properties": []
+    }
+  ]
+},
+
+"EUH 070(3)": {
+  "description": "Toxic by eye contact.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "n/a",
+      "hazardous_properties": []
+    }
+  ]
+},
+
+"EUH 071(3)": {
+  "description": "Corrosive to the respiratory tract.",
+  "rules": [
+    {
+      "hazard_classification": "n/a",
+      "threshold_reference": "n/a",
+      "hazardous_properties": []
+    }
+  ]
+}
+}

@@ -1,0 +1,12 @@
+{
+  "organisation_name": "DTS Works",
+  "site_name": "DTS Works Receiving Site",
+  "address": {
+    "full_address": "\n26a Oil Drum Lane, London, UK",
+    "postcode": "W12 7ZL"
+  },
+  "authorisation_number": "EPR/DD2522BF",
+  "api_code": "1f83215e-4b90-4785-9ab2-2614839aa2e9",
+  "email_address": null,
+  "phone_number": null
+}

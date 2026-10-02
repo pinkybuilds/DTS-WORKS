@@ -1,0 +1,126 @@
+[
+  {
+    "code": "END",
+    "chemicalName": "Endosulfan"
+  },
+  {
+    "code": "HCBD",
+    "chemicalName": "Hexachlorobutadiene"
+  },
+  {
+    "code": "PCNS",
+    "chemicalName": "Polychlorinated naphthalenes"
+  },
+  {
+    "code": "SCCPS",
+    "chemicalName": "Short-chain chlorinated paraffins"
+  },
+  {
+    "code": "TETRABDE",
+    "chemicalName": "Tetrabromodiphenyl ether"
+  },
+  {
+    "code": "PENTABDE",
+    "chemicalName": "Pentabromodiphenyl ether"
+  },
+  {
+    "code": "HEXABDE",
+    "chemicalName": "Hexabromodiphenyl ether"
+  },
+  {
+    "code": "HEPTABDE",
+    "chemicalName": "Heptabromodiphenyl ether"
+  },
+  {
+    "code": "DECABDE",
+    "chemicalName": "Decabromodiphenyl ether"
+  },
+  {
+    "code": "PBDES",
+    "chemicalName": "Tetra-, penta-, hexa-, hepta-, and deca- BDEs"
+  },
+  {
+    "code": "PFOS",
+    "chemicalName": "Perfluorooctane sulfonic acid (and derivatives)"
+  },
+  {
+    "code": "PCDD_PCDF",
+    "chemicalName": "Polychlorinated dibenzo-p-dioxins/furans"
+  },
+  {
+    "code": "DDT",
+    "chemicalName": "Dichlorodiphenyltrichloroethane"
+  },
+  {
+    "code": "CHL",
+    "chemicalName": "Chlordane"
+  },
+  {
+    "code": "HCH",
+    "chemicalName": "Hexachlorocyclohexanes (including lindane)"
+  },
+  {
+    "code": "DLD",
+    "chemicalName": "Dieldrin"
+  },
+  {
+    "code": "ENDN",
+    "chemicalName": "Endrin"
+  },
+  {
+    "code": "HPT",
+    "chemicalName": "Heptachlor"
+  },
+  {
+    "code": "HCB",
+    "chemicalName": "Hexachlorobenzene"
+  },
+  {
+    "code": "CLD",
+    "chemicalName": "Chlordecone"
+  },
+  {
+    "code": "ALD",
+    "chemicalName": "Aldrin"
+  },
+  {
+    "code": "PECBZ",
+    "chemicalName": "Pentachlorobenzene"
+  },
+  {
+    "code": "PCB",
+    "chemicalName": "Polychlorinated biphenyls"
+  },
+  {
+    "code": "MRX",
+    "chemicalName": "Mirex"
+  },
+  {
+    "code": "TOX",
+    "chemicalName": "Toxaphene"
+  },
+  {
+    "code": "HBB",
+    "chemicalName": "Hexabromobiphenyl"
+  },
+  {
+    "code": "HBCD",
+    "chemicalName": "Hexabromocyclododecane"
+  },
+  {
+    "code": "PCP",
+    "chemicalName": "Pentachlorophenol"
+  },
+  {
+    "code": "PFOA",
+    "chemicalName": "Perfluorooctanoic acid"
+  },
+  {
+    "code": "DCF",
+    "chemicalName": "Dicofol"
+  },
+  {
+    "code": "PFHXS",
+    "chemicalName": "Perfluorohexane sulfonic acid"
+  }
+]
