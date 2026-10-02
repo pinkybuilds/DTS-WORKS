@@ -5,6 +5,10 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 
 import { supabase } from "@/lib/supabase/client";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+  console.log("API:", API_BASE_URL);
+  console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -41,7 +45,7 @@ export default function LoginPage() {
   }
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/site-profile", {
+    const response = await fetch(`${API_BASE_URL}/site-profile`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken}`,
