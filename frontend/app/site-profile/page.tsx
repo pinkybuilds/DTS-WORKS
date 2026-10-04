@@ -59,9 +59,21 @@ export default function SiteProfilePage() {
           },
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to load Site Profile.");
-        }
+       if (!response.ok) {
+  const errorData = await response.json().catch(() => null);
+
+  console.error("Site Profile request failed:", {
+    status: response.status,
+    statusText: response.statusText,
+    body: errorData,
+  });
+
+  throw new Error(
+    typeof errorData?.detail === "string"
+      ? `Site Profile failed (${response.status}): ${errorData.detail}`
+      : `Site Profile failed (${response.status}): ${response.statusText}`,
+  );
+}
 
         const data: SiteProfile = await response.json();
 
