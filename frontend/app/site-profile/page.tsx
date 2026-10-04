@@ -59,28 +59,36 @@ export default function SiteProfilePage() {
           },
         });
 
-       if (!response.ok) {
-  const errorData = await response.json().catch(() => null);
 
-  console.error("Site Profile request failed:", {
-    status: response.status,
-    statusText: response.statusText,
-    body: errorData,
-  });
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
 
-  throw new Error(
-    typeof errorData?.detail === "string"
-      ? `Site Profile failed (${response.status}): ${errorData.detail}`
-      : `Site Profile failed (${response.status}): ${response.statusText}`,
-  );
-}
+          console.error("Site Profile request failed:", {
+            status: response.status,
+            statusText: response.statusText,
+            body: errorData,
+          });
+
+          throw new Error(
+            typeof errorData?.detail === "string"
+              ? `Site Profile failed (${response.status}): ${errorData.detail}`
+              : `Site Profile failed (${response.status}): ${response.statusText}`,
+          );
+        }
 
         const data: SiteProfile = await response.json();
 
         setProfile(data);
+
       } catch (err) {
         console.error(err);
-        setError("We couldn't load your Site Profile.");
+
+        setError(
+          err instanceof Error
+            ? err.message
+            : "We couldn't load your Site Profile.",
+        );
+
       } finally {
         setLoading(false);
       }
