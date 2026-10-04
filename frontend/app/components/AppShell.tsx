@@ -5,9 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import AppNavigation from "./AppNavigation";
 import { supabase } from "@/lib/supabase/client";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-
 export default function AppShell({
   children,
 }: {
@@ -16,7 +13,7 @@ export default function AppShell({
   const pathname = usePathname();
   const router = useRouter();
 
-  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   const isAuthRoute =
@@ -28,15 +25,15 @@ export default function AppShell({
 
   useEffect(() => {
     if (isAuthRoute) {
-      setIsCheckingOnboarding(false);
+      setIsCheckingAuth(false);
       setIsRedirecting(false);
       return;
     }
 
     let isActive = true;
 
-    const checkAuthenticationAndOnboarding = async () => {
-      setIsCheckingOnboarding(true);
+    const checkAuthentication = async () => {
+      setIsCheckingAuth(true);
       setIsRedirecting(false);
 
       const {
@@ -55,57 +52,10 @@ export default function AppShell({
         return;
       }
 
-      try {
-        const session = await supabase.auth.getSession();
-
-        const response = await fetch(
-          `${API_BASE_URL}/site-profile`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${
-                session.data.session?.access_token ?? ""
-              }`,
-            },
-          },
-        );
-
-        if (!isActive) {
-          return;
-        }
-
-        if (response.status === 401 || response.status === 403) {
-          setIsRedirecting(true);
-          router.replace("/login");
-          return;
-        }
-
-        if (!response.ok) {
-          console.error(
-            "Unable to verify site profile:",
-            response.status,
-          );
-
-          setIsCheckingOnboarding(false);
-          return;
-        }
-
-        setIsCheckingOnboarding(false);
-      } catch (error) {
-        if (!isActive) {
-          return;
-        }
-
-        console.error(
-          "Unable to connect to DTS Works backend:",
-          error,
-        );
-
-        setIsCheckingOnboarding(false);
-      }
+      setIsCheckingAuth(false);
     };
 
-    checkAuthenticationAndOnboarding();
+    checkAuthentication();
 
     return () => {
       isActive = false;
@@ -116,7 +66,7 @@ export default function AppShell({
     return <main className="min-h-screen">{children}</main>;
   }
 
-  if (isCheckingOnboarding || isRedirecting) {
+  if (isCheckingAuth || isRedirecting) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-50">
         <p className="text-sm text-slate-500">
@@ -125,11 +75,11 @@ export default function AppShell({
       </main>
     );
   }
-return (
-  <div className="min-h-screen">
-    <AppNavigation />
-    <main className="min-w-0">{children}</main>
-  </div>
-   );
-}
 
+  return (
+    <div className="min-h-screen">
+      <AppNavigation />
+      <main className="min-w-0">{children}</main>
+    </div>
+  );
+}
