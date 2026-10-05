@@ -6,7 +6,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 
-type OnboardingStep = 1 | 2 | 3;
+type OnboardingStep = 1 | 2 | 3 | 4;
+
+type Plan = "starter" | "professional" | "business";
 
 type OnboardingErrorType =
   | "network"
@@ -15,11 +17,69 @@ type OnboardingErrorType =
   | "server"
   | "unknown";
 
+type OnboardingDraft = {
+  step?: number;
+  firstName?: string;
+  organisationName?: string;
+  siteName?: string;
+  fullAddress?: string;
+  postcode?: string;
+  authorisationNumber?: string;
+  apiCode?: string;
+  emailAddress?: string;
+  phoneNumber?: string;
+  acceptedLegal?: boolean;
+  selectedPlan?: Plan | "";
+  onboardingSaved?: boolean;
+};
+
 const TERMS_VERSION = "TOS-2026-09-28";
 const PRIVACY_POLICY_VERSION = "PRIVACY-2026-09-28";
+
 const ONBOARDING_DRAFT_KEY = "dts-works-onboarding-draft";
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
+/*
+ * This is the backend endpoint we will create in checkout.py.
+ *
+ * The frontend sends only the DTS Works plan name.
+ * The backend remains responsible for mapping the plan
+ * to the correct Stripe Price ID.
+ */
+const STRIPE_CHECKOUT_ENDPOINT = "/stripe/create-checkout-session";
+
+const PLANS: {
+  id: Plan;
+  name: string;
+  price: string;
+  description: string;
+  sites: string;
+}[] = [
+  {
+    id: "starter",
+    name: "Starter",
+    price: "£69/month",
+    description: "For single-site operations.",
+    sites: "1 site",
+  },
+  {
+    id: "professional",
+    name: "Professional",
+    price: "£99/month",
+    description: "For growing operations.",
+    sites: "2–3 sites",
+  },
+  {
+    id: "business",
+    name: "Business",
+    price: "£199/month",
+    description: "For larger, high-volume operations.",
+    sites: "Large / high-volume operations",
+  },
+];
+
 export default function OnboardingPage() {
   const router = useRouter();
 
@@ -36,27 +96,61 @@ export default function OnboardingPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const [acceptedLegal, setAcceptedLegal] = useState(false);
+
+  const [selectedPlan, setSelectedPlan] = useState<Plan | "">("");
+
+  const [onboardingSaved, setOnboardingSaved] = useState(false);
+
   const [isDraftLoaded, setIsDraftLoaded] = useState(false);
 
   const [validationError, setValidationError] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [submitErrorType, setSubmitErrorType] =
     useState<OnboardingErrorType | null>(null);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  /*
+   * Restore an existing onboarding draft.
+   *
+   * We also look for ?plan=starter, ?plan=professional or
+   * ?plan=business so the public Pricing page can carry
+   * the customer's selected plan into onboarding.
+   */
   useEffect(() => {
     const savedDraft = sessionStorage.getItem(ONBOARDING_DRAFT_KEY);
 
+    let planFromUrl: Plan | "" = "";
+
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const plan = params.get("plan");
+
+      if (
+        plan === "starter" ||
+        plan === "professional" ||
+        plan === "business"
+      ) {
+        planFromUrl = plan;
+      }
+    } catch {
+      planFromUrl = "";
+    }
+
     if (!savedDraft) {
+      if (planFromUrl) {
+        setSelectedPlan(planFromUrl);
+      }
+
       setIsDraftLoaded(true);
       return;
     }
 
     try {
-      const draft = JSON.parse(savedDraft);
+      const draft: OnboardingDraft = JSON.parse(savedDraft);
 
-      if (draft.step >= 1 && draft.step <= 3) {
-        setStep(draft.step);
+      if (draft.step && draft.step >= 1 && draft.step <= 4) {
+        setStep(draft.step as OnboardingStep);
       }
 
       setFirstName(draft.firstName ?? "");
@@ -69,19 +163,39 @@ export default function OnboardingPage() {
       setEmailAddress(draft.emailAddress ?? "");
       setPhoneNumber(draft.phoneNumber ?? "");
       setAcceptedLegal(draft.acceptedLegal ?? false);
+
+      if (
+        draft.selectedPlan === "starter" ||
+        draft.selectedPlan === "professional" ||
+        draft.selectedPlan === "business"
+      ) {
+        setSelectedPlan(draft.selectedPlan);
+      } else if (planFromUrl) {
+        setSelectedPlan(planFromUrl);
+      }
+
+      setOnboardingSaved(draft.onboardingSaved ?? false);
     } catch {
       sessionStorage.removeItem(ONBOARDING_DRAFT_KEY);
+
+      if (planFromUrl) {
+        setSelectedPlan(planFromUrl);
+      }
     } finally {
       setIsDraftLoaded(true);
     }
   }, []);
 
+  /*
+   * Persist the onboarding draft so the user can leave and
+   * come back without losing their information.
+   */
   useEffect(() => {
     if (!isDraftLoaded) {
       return;
     }
 
-    const draft = {
+    const draft: OnboardingDraft = {
       step,
       firstName,
       organisationName,
@@ -93,6 +207,8 @@ export default function OnboardingPage() {
       emailAddress,
       phoneNumber,
       acceptedLegal,
+      selectedPlan,
+      onboardingSaved,
     };
 
     sessionStorage.setItem(
@@ -112,12 +228,18 @@ export default function OnboardingPage() {
     emailAddress,
     phoneNumber,
     acceptedLegal,
+    selectedPlan,
+    onboardingSaved,
   ]);
 
-  const goBack = () => {
+  const clearErrors = () => {
     setValidationError("");
     setSubmitError("");
     setSubmitErrorType(null);
+  };
+
+  const goBack = () => {
+    clearErrors();
 
     if (step === 1) {
       return;
@@ -128,13 +250,16 @@ export default function OnboardingPage() {
       return;
     }
 
-    setStep(2);
+    if (step === 3) {
+      setStep(2);
+      return;
+    }
+
+    setStep(3);
   };
 
   const goContinue = () => {
-    setValidationError("");
-    setSubmitError("");
-    setSubmitErrorType(null);
+    clearErrors();
 
     if (step === 1) {
       const missingFields: string[] = [];
@@ -153,6 +278,7 @@ export default function OnboardingPage() {
             missingFields.length === 1 ? "is" : "are"
           } required.`,
         );
+
         return;
       }
 
@@ -181,18 +307,66 @@ export default function OnboardingPage() {
             missingFields.length === 1 ? "is" : "are"
           } required.`,
         );
+
         return;
       }
 
       setStep(3);
       return;
     }
+
+    if (step === 3) {
+      const missingFields: string[] = [];
+
+      if (!authorisationNumber.trim()) {
+        missingFields.push("Authorisation number");
+      }
+
+      if (!apiCode.trim()) {
+        missingFields.push("API code");
+      }
+
+      if (missingFields.length > 0) {
+        setValidationError(
+          `${missingFields.join(", ")} ${
+            missingFields.length === 1 ? "is" : "are"
+          } required.`,
+        );
+
+        return;
+      }
+
+      if (!acceptedLegal) {
+        setValidationError(
+          "You must agree to the DTS Works Terms of Service and acknowledge the Privacy Policy before continuing.",
+        );
+
+        return;
+      }
+
+      /*
+       * Step 4 is the payment stage.
+       *
+       * The organisation/site/profile/legal information is saved
+       * before Stripe is opened.
+       */
+      if (onboardingSaved) {
+        setStep(4);
+        return;
+      }
+
+      handleSaveOnboarding();
+    }
   };
 
-  const handleCompleteSetup = async () => {
-    setValidationError("");
-    setSubmitError("");
-    setSubmitErrorType(null);
+  /*
+   * Save organisation, receiving site, authorisation,
+   * contact and legal acceptance before payment.
+   *
+   * This deliberately does NOT activate a subscription.
+   */
+  const handleSaveOnboarding = async () => {
+    clearErrors();
 
     const missingFields: string[] = [];
 
@@ -230,13 +404,15 @@ export default function OnboardingPage() {
           missingFields.length === 1 ? "is" : "are"
         } required.`,
       );
+
       return;
     }
 
     if (!acceptedLegal) {
       setValidationError(
-        "You must agree to the DTS Works Terms of Service and acknowledge the Privacy Policy before completing setup.",
+        "You must agree to the DTS Works Terms of Service and acknowledge the Privacy Policy before continuing.",
       );
+
       return;
     }
 
@@ -255,6 +431,7 @@ export default function OnboardingPage() {
         setSubmitError(
           "Your session has expired. Please sign in again.",
         );
+
         return;
       }
 
@@ -265,6 +442,7 @@ export default function OnboardingPage() {
         setSubmitError(
           "Your session has expired. Please sign in again.",
         );
+
         return;
       }
 
@@ -295,53 +473,68 @@ export default function OnboardingPage() {
           },
         );
       } catch (error) {
-        console.error("Onboarding request failed:", error);
+        console.error(
+          "Onboarding request failed:",
+          error,
+        );
 
         setSubmitErrorType("network");
         setSubmitError(
           "We couldn't connect to DTS Works. Please check your connection and try again. Your setup information has not been lost.",
         );
+
         return;
       }
 
       let result: {
-  detail?: string | Array<{ msg?: string }>;
-} = {};
+        detail?: string | Array<{ msg?: string }>;
+      } = {};
 
-try {
-  result = await response.json();
-} catch {
-  result = {};
-}
+      try {
+        result = await response.json();
+      } catch {
+        result = {};
+      }
 
-      if (response.status === 401 || response.status === 403) {
+      if (
+        response.status === 401 ||
+        response.status === 403
+      ) {
         setSubmitErrorType("auth");
         setSubmitError(
           "Your session has expired. Please sign in again.",
         );
+
         return;
       }
 
-      if (response.status === 400 || response.status === 422) {
-  setSubmitErrorType("validation");
+      if (
+        response.status === 400 ||
+        response.status === 422
+      ) {
+        setSubmitErrorType("validation");
 
-  const detail = result?.detail;
+        const detail = result?.detail;
 
-  if (typeof detail === "string") {
-    setSubmitError(detail);
-  } else if (Array.isArray(detail) && detail.length > 0) {
-    setSubmitError(
-      detail[0]?.msg ||
-        "Check the information you entered and try again.",
-    );
-  } else {
-    setSubmitError(
-      "Check the information you entered and try again.",
-    );
-  }
+        if (typeof detail === "string") {
+          setSubmitError(detail);
+        } else if (
+          Array.isArray(detail) &&
+          detail.length > 0
+        ) {
+          setSubmitError(
+            detail[0]?.msg ||
+              "Check the information you entered and try again.",
+          );
+        } else {
+          setSubmitError(
+            "Check the information you entered and try again.",
+          );
+        }
 
-  return;
-}
+        return;
+      }
+
       if (!response.ok) {
         console.error(
           "Onboarding server error:",
@@ -351,19 +544,230 @@ try {
 
         setSubmitErrorType("server");
         setSubmitError(
-          "Something went wrong while completing setup. Please try again.",
+          "Something went wrong while saving your setup. Please try again.",
         );
+
         return;
       }
 
-      sessionStorage.removeItem(ONBOARDING_DRAFT_KEY);
-      router.push("/");
+      /*
+       * The organisation/site/profile/legal information now exists
+       * in DTS Works, so the user can safely proceed to payment.
+       */
+      setOnboardingSaved(true);
+      setStep(4);
     } catch (error) {
-      console.error("Unexpected onboarding error:", error);
+      console.error(
+        "Unexpected onboarding error:",
+        error,
+      );
 
       setSubmitErrorType("unknown");
       setSubmitError(
         "Something unexpected happened. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  /*
+   * Start Stripe Checkout.
+   *
+   * IMPORTANT:
+   * The backend endpoint is authoritative.
+   * The frontend sends only the DTS Works plan name.
+   *
+   * The backend will:
+   * - authenticate the user
+   * - resolve the organisation
+   * - map the plan to its Stripe Price ID
+   * - create/reuse the Stripe customer
+   * - create the Checkout Session
+   * - return the Checkout URL
+   *
+   * It must NOT activate the subscription.
+   * The webhook will do that later.
+   */
+  const handleContinueToPayment = async () => {
+    clearErrors();
+
+    if (!selectedPlan) {
+      setValidationError(
+        "Please choose a plan before continuing to payment.",
+      );
+
+      return;
+    }
+
+    if (!onboardingSaved) {
+      setValidationError(
+        "Please complete your setup details before continuing to payment.",
+      );
+
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error(
+          "Unable to retrieve Supabase session:",
+          error,
+        );
+
+        setSubmitErrorType("auth");
+        setSubmitError(
+          "Your session has expired. Please sign in again.",
+        );
+
+        return;
+      }
+
+      const session = data.session;
+
+      if (!session?.access_token) {
+        setSubmitErrorType("auth");
+        setSubmitError(
+          "Your session has expired. Please sign in again.",
+        );
+
+        return;
+      }
+
+      let response: Response;
+
+      try {
+        response = await fetch(
+          `${API_BASE_URL}${STRIPE_CHECKOUT_ENDPOINT}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              plan: selectedPlan,
+            }),
+          },
+        );
+      } catch (error) {
+        console.error(
+          "Stripe Checkout request failed:",
+          error,
+        );
+
+        setSubmitErrorType("network");
+        setSubmitError(
+          "We couldn't connect to DTS Works. Please check your connection and try again.",
+        );
+
+        return;
+      }
+
+      let result: {
+        detail?: string | Array<{ msg?: string }>;
+        checkout_url?: string;
+        url?: string;
+      } = {};
+
+      try {
+        result = await response.json();
+      } catch {
+        result = {};
+      }
+
+      if (
+        response.status === 401 ||
+        response.status === 403
+      ) {
+        setSubmitErrorType("auth");
+        setSubmitError(
+          "Your session has expired. Please sign in again.",
+        );
+
+        return;
+      }
+
+      if (
+        response.status === 400 ||
+        response.status === 422
+      ) {
+        setSubmitErrorType("validation");
+
+        const detail = result?.detail;
+
+        if (typeof detail === "string") {
+          setSubmitError(detail);
+        } else if (
+          Array.isArray(detail) &&
+          detail.length > 0
+        ) {
+          setSubmitError(
+            detail[0]?.msg ||
+              "Check your plan selection and try again.",
+          );
+        } else {
+          setSubmitError(
+            "Check your plan selection and try again.",
+          );
+        }
+
+        return;
+      }
+
+      if (!response.ok) {
+        console.error(
+          "Stripe Checkout server error:",
+          response.status,
+          result,
+        );
+
+        setSubmitErrorType("server");
+        setSubmitError(
+          "Something went wrong while preparing payment. Please try again.",
+        );
+
+        return;
+      }
+
+      const checkoutUrl =
+        result.checkout_url || result.url;
+
+      if (!checkoutUrl) {
+        console.error(
+          "Stripe Checkout response did not contain a checkout URL:",
+          result,
+        );
+
+        setSubmitErrorType("server");
+        setSubmitError(
+          "We couldn't start payment. Please try again.",
+        );
+
+        return;
+      }
+
+      /*
+       * Do not remove the onboarding draft yet.
+       *
+       * If the customer leaves Stripe without completing payment,
+       * we want their onboarding information and selected plan
+       * to remain available when they return.
+       */
+      window.location.href = checkoutUrl;
+    } catch (error) {
+      console.error(
+        "Unexpected Stripe Checkout error:",
+        error,
+      );
+
+      setSubmitErrorType("unknown");
+      setSubmitError(
+        "Something unexpected happened while preparing payment. Please try again.",
       );
     } finally {
       setIsSubmitting(false);
@@ -383,7 +787,14 @@ try {
       number: 3,
       label: "Authorisation",
     },
+    {
+      number: 4,
+      label: "Plan & payment",
+    },
   ];
+
+  const selectedPlanDetails =
+    PLANS.find((plan) => plan.id === selectedPlan);
 
   return (
     <main className="min-h-screen bg-[#0B1730] text-white">
@@ -412,13 +823,13 @@ try {
             </h1>
 
             <p className="mt-3 text-sm text-slate-300 sm:text-base">
-              A few details and you&apos;ll be ready to get started with DTS
-              Works.
+              A few details and you&apos;ll be ready to get started
+              with DTS Works.
             </p>
           </div>
 
-          <div className="mb-10">
-            <div className="flex items-center justify-center">
+          <div className="mb-10 overflow-x-auto pb-2">
+            <div className="flex min-w-[560px] items-center justify-center">
               {stepLabels.map((item, index) => {
                 const isActive = step === item.number;
                 const isComplete = step > item.number;
@@ -442,7 +853,7 @@ try {
                       </div>
 
                       <span
-                        className={`mt-2 text-xs sm:text-sm ${
+                        className={`mt-2 whitespace-nowrap text-xs sm:text-sm ${
                           isActive
                             ? "font-medium text-white"
                             : "text-slate-400"
@@ -454,7 +865,7 @@ try {
 
                     {index < stepLabels.length - 1 && (
                       <div
-                        className={`mx-3 mb-6 h-px w-10 sm:w-20 ${
+                        className={`mx-3 mb-6 h-px w-8 sm:w-14 ${
                           step > item.number
                             ? "bg-[#1E3768]"
                             : "bg-slate-600/50"
@@ -476,7 +887,10 @@ try {
                   </h2>
 
                   <p className="mt-2 text-sm leading-6 text-slate-300">
-                    Let&apos;s start with the organisation using DTS Works.
+                    This is the business or organisation that will
+                    use DTS Works. If you operate multiple waste
+                    facilities, they can all sit under the same
+                    organisation.
                   </p>
                 </div>
 
@@ -521,8 +935,27 @@ try {
                         setValidationError("");
                       }}
                       className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
-                      placeholder="Your organisation name"
+                      placeholder="e.g. GreenCycle Recycling Ltd"
                     />
+
+                    <p className="mt-2 text-xs leading-5 text-slate-400">
+                      Enter the legal or trading name of the
+                      business responsible for your DTS Works
+                      workspace.
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-500/30 bg-white/5 px-4 py-4">
+                    <p className="text-sm font-medium text-white">
+                      Organisation = your business
+                    </p>
+
+                    <p className="mt-1 text-sm leading-6 text-slate-300">
+                      For example, your organisation could be
+                      &quot;GreenCycle Recycling Ltd&quot;. Your
+                      receiving sites are the physical waste
+                      facilities that belong to that organisation.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -532,11 +965,12 @@ try {
               <div>
                 <div className="mb-7">
                   <h2 className="text-2xl font-semibold">
-                    Set up your receiving site
+                    Tell us about your receiving site
                   </h2>
 
                   <p className="mt-2 text-sm leading-6 text-slate-300">
-                    Tell us where your waste operations take place.
+                    This is the physical waste facility or location
+                    where your operations take place.
                   </p>
                 </div>
 
@@ -546,7 +980,7 @@ try {
                       htmlFor="site-name"
                       className="mb-2 block text-sm font-medium text-slate-200"
                     >
-                      Site name
+                      Receiving site name
                     </label>
 
                     <input
@@ -559,8 +993,13 @@ try {
                         setValidationError("");
                       }}
                       className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
-                      placeholder="Receiving site name"
+                      placeholder="e.g. GreenCycle Birmingham Facility"
                     />
+
+                    <p className="mt-2 text-xs leading-5 text-slate-400">
+                      Give the facility a name that helps you
+                      recognise it within DTS Works.
+                    </p>
                   </div>
 
                   <div>
@@ -609,12 +1048,27 @@ try {
 
                   <div className="rounded-lg border border-slate-500/30 bg-white/5 px-4 py-4">
                     <p className="text-sm font-medium text-white">
+                      Receiving site = the physical facility
+                    </p>
+
+                    <p className="mt-1 text-sm leading-6 text-slate-300">
+                      For example, your organisation might be
+                      &quot;GreenCycle Recycling Ltd&quot; and your
+                      receiving site might be &quot;GreenCycle
+                      Birmingham Facility&quot;.
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-500/30 bg-white/5 px-4 py-4">
+                    <p className="text-sm font-medium text-white">
                       Run more than one site?
                     </p>
 
                     <p className="mt-1 text-sm leading-6 text-slate-300">
-                      You can add additional receiving sites later from your
-                      DTS Works workspace.
+                      You can add additional receiving sites later
+                      from your DTS Works workspace. Your organisation
+                      stays the same while each physical facility is
+                      recorded as its own receiving site.
                     </p>
                   </div>
                 </div>
@@ -629,8 +1083,8 @@ try {
                   </h2>
 
                   <p className="mt-2 text-sm leading-6 text-slate-300">
-                    Add the details DTS Works will use for your receiving-site
-                    records.
+                    Add the regulatory and contact details DTS Works
+                    will use for your receiving-site records.
                   </p>
                 </div>
 
@@ -729,8 +1183,8 @@ try {
                       </h3>
 
                       <p className="mt-2 text-sm leading-6 text-slate-300">
-                        Before you finish setting up DTS Works, please review
-                        the following.
+                        Before we save your workspace details,
+                        please review and accept the following.
                       </p>
                     </div>
 
@@ -767,14 +1221,141 @@ try {
                         .
                       </span>
                     </label>
-                {!acceptedLegal && (
-             <p className="mt-3 text-sm leading-6 text-slate-400">
-             Please accept the Terms of Service and acknowledge the Privacy Policy to
-             complete setup.
-             </p>
-             )}
-             </div>
+
+                    {!acceptedLegal && (
+                      <p className="mt-3 text-sm leading-6 text-slate-400">
+                        Please accept the Terms of Service and
+                        acknowledge the Privacy Policy to continue.
+                      </p>
+                    )}
+                  </div>
                 </div>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div>
+                <div className="mb-7">
+                  <h2 className="text-2xl font-semibold">
+                    Choose your DTS Works plan
+                  </h2>
+
+                  <p className="mt-2 text-sm leading-6 text-slate-300">
+                    Your workspace details are saved. Choose the
+                    plan that fits your operation to continue to
+                    secure payment.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  {PLANS.map((plan) => {
+                    const isSelected = selectedPlan === plan.id;
+
+                    return (
+                      <button
+                        key={plan.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedPlan(plan.id);
+                          setValidationError("");
+                          setSubmitError("");
+                          setSubmitErrorType(null);
+                        }}
+                        className={`w-full rounded-xl border p-5 text-left transition ${
+                          isSelected
+                            ? "border-white bg-white text-[#142A52] shadow-lg"
+                            : "border-slate-500/50 bg-white/5 text-white hover:border-slate-300/70 hover:bg-white/[0.08]"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <h3 className="text-lg font-semibold">
+                              {plan.name}
+                            </h3>
+
+                            <p
+                              className={`mt-1 text-sm ${
+                                isSelected
+                                  ? "text-slate-600"
+                                  : "text-slate-300"
+                              }`}
+                            >
+                              {plan.description}
+                            </p>
+                          </div>
+
+                          <div
+                            className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
+                              isSelected
+                                ? "bg-[#142A52] text-white"
+                                : "border border-slate-400/40 text-slate-200"
+                            }`}
+                          >
+                            {plan.sites}
+                          </div>
+                        </div>
+
+                        <div className="mt-5 flex items-end justify-between gap-4">
+                          <p className="text-xl font-semibold">
+                            {plan.price}
+                          </p>
+
+                          <div
+                            className={`flex h-5 w-5 items-center justify-center rounded-full border ${
+                              isSelected
+                                ? "border-[#142A52] bg-[#142A52]"
+                                : "border-slate-400"
+                            }`}
+                          >
+                            {isSelected && (
+                              <span className="text-xs text-white">
+                                ✓
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-6 rounded-lg border border-slate-500/30 bg-white/5 px-4 py-4">
+                  <p className="text-sm font-medium text-white">
+                    Your setup is almost complete.
+                  </p>
+
+                  <p className="mt-1 text-sm leading-6 text-slate-300">
+                    Your organisation, receiving site and setup
+                    details have been saved. Payment is the final
+                    step before your DTS Works workspace is
+                    activated.
+                  </p>
+                </div>
+
+                {selectedPlanDetails && (
+                  <div className="mt-4 rounded-lg border border-[#1E3768] bg-[#1E3768]/30 px-4 py-4">
+                    <p className="text-sm font-medium text-white">
+                      Selected plan
+                    </p>
+
+                    <div className="mt-1 flex items-center justify-between gap-4">
+                      <p className="text-sm text-slate-200">
+                        {selectedPlanDetails.name}
+                      </p>
+
+                      <p className="text-sm font-semibold text-white">
+                        {selectedPlanDetails.price}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <p className="mt-5 text-xs leading-5 text-slate-400">
+                  You&apos;ll be securely redirected to Stripe to
+                  complete payment. DTS Works will only activate
+                  your subscription after Stripe confirms the
+                  payment.
+                </p>
               </div>
             )}
 
@@ -826,28 +1407,48 @@ try {
                 <button
                   type="button"
                   onClick={goContinue}
-                  className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70"
+                  disabled={isSubmitting}
+                  className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Continue
                 </button>
-              ) : (
+              ) : step === 3 ? (
                 <button
                   type="button"
-                  onClick={handleCompleteSetup}
+                  onClick={goContinue}
                   disabled={isSubmitting || !acceptedLegal}
                   className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isSubmitting
-                    ? "Completing setup…"
-                    : "Complete setup"}
+                    ? "Saving setup…"
+                    : "Continue to plan"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleContinueToPayment}
+                  disabled={isSubmitting || !selectedPlan}
+                  className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isSubmitting
+                    ? "Preparing payment…"
+                    : "Continue to payment"}
                 </button>
               )}
             </div>
 
             {step === 3 && (
               <p className="mt-3 text-center text-xs text-slate-400">
-                Your workspace and receiving-site profile will be created
-                securely.
+                Your organisation and receiving-site information
+                will be saved before you continue to payment.
+              </p>
+            )}
+
+            {step === 4 && (
+              <p className="mt-3 text-center text-xs text-slate-400">
+                Secure payment is provided by Stripe. Your DTS Works
+                subscription will be confirmed after payment is
+                verified.
               </p>
             )}
           </div>
