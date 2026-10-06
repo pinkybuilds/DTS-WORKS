@@ -94,6 +94,8 @@ export default function OnboardingPage() {
   const [apiCode, setApiCode] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const DEV_PREVIEW = process.env.NODE_ENV !== "production";
+
 
   const [acceptedLegal, setAcceptedLegal] = useState(false);
 
@@ -259,6 +261,21 @@ export default function OnboardingPage() {
   };
 
   const goContinue = () => {
+    if (DEV_PREVIEW) {
+  clearErrors();
+  setValidationError("");
+  setSubmitError("");
+  setSubmitErrorType(null);
+
+  setStep((currentStep) => {
+  if (currentStep === 1) return 2;
+  if (currentStep === 2) return 3;
+  if (currentStep === 3) return 4;
+  return currentStep;
+});
+
+  return;
+}
     clearErrors();
 
     if (step === 1) {
@@ -1384,7 +1401,7 @@ export default function OnboardingPage() {
       <button
         type="button"
         onClick={goContinue}
-        disabled={isSubmitting || !acceptedLegal}
+       disabled={isSubmitting || (!DEV_PREVIEW && !acceptedLegal)}
         className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting
