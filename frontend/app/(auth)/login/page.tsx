@@ -29,7 +29,11 @@ export default function LoginPage() {
       email,
       password,
     });
-
+   
+    console.log("SIGNED-IN USER:", {
+  id: data.user?.id,
+  email: data.user?.email,
+});
     if (error) {
       setErrorMessage(error.message);
       setIsSigningIn(false);
