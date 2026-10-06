@@ -74,13 +74,10 @@ export default function LoginPage() {
       }
 
       if (response.status === 404) {
-        setErrorMessage(
-          detail ||
-            "Your account is signed in, but we could not find your workspace.",
-        );
-        setIsSigningIn(false);
-        return;
-      }
+  window.location.href = "/onboarding";
+  return;
+}
+      
 
       setErrorMessage(
         detail || "We could not check your account setup. Please try again.",
