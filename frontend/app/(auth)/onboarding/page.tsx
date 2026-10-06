@@ -879,581 +879,549 @@ export default function OnboardingPage() {
           </div>
 
           <div className="mx-auto w-full max-w-xl">
-            {step === 1 && (
-              <div>
-                <div className="mb-7">
-                  <h2 className="text-2xl font-semibold">
-                    Tell us about your organisation
-                  </h2>
+  {step === 1 && (
+    <div>
+      <div className="mb-7">
+        <h2 className="text-2xl font-semibold">
+          Tell us about your organisation
+        </h2>
 
-                  <p className="mt-2 text-sm leading-6 text-slate-300">
-                    This is the business or organisation that will
-                    use DTS Works. If you operate multiple waste
-                    facilities, they can all sit under the same
-                    organisation.
+        <p className="mt-2 text-sm leading-6 text-slate-300">
+          This is the business or organisation that will use DTS Works.
+        </p>
+      </div>
+
+      <div className="space-y-5">
+        <div>
+          <label
+            htmlFor="first-name"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
+            First name
+          </label>
+
+          <input
+            id="first-name"
+            type="text"
+            required
+            value={firstName}
+            onChange={(event) => {
+              setFirstName(event.target.value);
+              setValidationError("");
+            }}
+            className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
+            placeholder="Your first name"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="organisation-name"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
+            Organisation name
+          </label>
+
+          <input
+            id="organisation-name"
+            type="text"
+            required
+            value={organisationName}
+            onChange={(event) => {
+              setOrganisationName(event.target.value);
+              setValidationError("");
+            }}
+            className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
+            placeholder="e.g. GreenCycle Recycling Ltd"
+          />
+
+          <p className="mt-2 text-xs leading-5 text-slate-400">
+            Enter the legal or trading name of the
+            business responsible for your DTS Works
+            workspace.
+          </p>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {step === 2 && (
+    <div>
+      <div className="mb-7">
+        <h2 className="text-2xl font-semibold">
+          Tell us about your receiving site
+        </h2>
+
+        <p className="mt-2 text-sm leading-6 text-slate-300">
+          This is the physical facility where waste is received.
+        </p>
+      </div>
+
+      <div className="space-y-5">
+        <div>
+          <label
+            htmlFor="site-name"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
+            Receiving site name
+          </label>
+
+          <input
+            id="site-name"
+            type="text"
+            required
+            value={siteName}
+            onChange={(event) => {
+              setSiteName(event.target.value);
+              setValidationError("");
+            }}
+            className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
+            placeholder="e.g. GreenCycle Birmingham Facility"
+          />
+
+          <p className="mt-2 text-xs leading-5 text-slate-400">
+            Give the facility a name that helps you
+            recognise it within DTS Works.
+          </p>
+        </div>
+
+        <div>
+          <label
+            htmlFor="full-address"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
+            Full address
+          </label>
+
+          <textarea
+            id="full-address"
+            required
+            rows={3}
+            value={fullAddress}
+            onChange={(event) => {
+              setFullAddress(event.target.value);
+              setValidationError("");
+            }}
+            className="w-full resize-none rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
+            placeholder="Enter the full receiving-site address"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="postcode"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
+            Postcode
+          </label>
+
+          <input
+            id="postcode"
+            type="text"
+            required
+            value={postcode}
+            onChange={(event) => {
+              setPostcode(event.target.value);
+              setValidationError("");
+            }}
+            className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
+            placeholder="e.g. W12 7ZL"
+          />
+        </div>
+
+        <div className="rounded-lg border border-slate-500/30 bg-white/5 px-4 py-4">
+          <p className="text-sm font-medium text-white">
+            Managing multiple sites?
+          </p>
+
+          <p className="mt-1 text-sm leading-6 text-slate-300">
+            Additional receiving sites can be added from your DTS Works
+            workspace, depending on your plan.
+          </p>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {step === 3 && (
+    <div>
+      <div className="mb-7">
+        <h2 className="text-2xl font-semibold">
+          Authorisation &amp; contact
+        </h2>
+
+        <p className="mt-2 text-sm leading-6 text-slate-300">
+          Add the regulatory and contact details DTS Works
+          will use for your receiving-site records.
+        </p>
+      </div>
+
+      <div className="space-y-5">
+        <div>
+          <label
+            htmlFor="authorisation-number"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
+            Authorisation number
+          </label>
+
+          <input
+            id="authorisation-number"
+            type="text"
+            required
+            value={authorisationNumber}
+            onChange={(event) => {
+              setAuthorisationNumber(event.target.value);
+              setValidationError("");
+            }}
+            className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
+            placeholder="Enter your authorisation number"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="api-code"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
+            API code
+          </label>
+
+          <input
+            id="api-code"
+            type="text"
+            required
+            value={apiCode}
+            onChange={(event) => {
+              setApiCode(event.target.value);
+              setValidationError("");
+            }}
+            className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
+            placeholder="Enter your API code"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="email-address"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
+            Email address
+          </label>
+
+          <input
+            id="email-address"
+            type="email"
+            value={emailAddress}
+            onChange={(event) =>
+              setEmailAddress(event.target.value)
+            }
+            className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="phone-number"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
+            Phone number{" "}
+            <span className="font-normal text-slate-400">
+              (optional)
+            </span>
+          </label>
+
+          <input
+            id="phone-number"
+            type="tel"
+            value={phoneNumber}
+            onChange={(event) =>
+              setPhoneNumber(event.target.value)
+            }
+            className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
+            placeholder="Phone number"
+          />
+        </div>
+
+        <div className="pt-3">
+          <div className="mb-4">
+            <h3 className="text-base font-semibold text-white">
+              Review and accept
+            </h3>
+
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              Before we save your workspace details,
+              please review and accept the following.
+            </p>
+          </div>
+
+          <label
+            htmlFor="legal-acceptance"
+            className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-500/40 bg-white/5 px-4 py-4 transition hover:bg-white/[0.07]"
+          >
+            <input
+              id="legal-acceptance"
+              type="checkbox"
+              checked={acceptedLegal}
+              onChange={(event) => {
+                setAcceptedLegal(event.target.checked);
+                setValidationError("");
+              }}
+              className="mt-1 h-4 w-4 shrink-0 cursor-pointer rounded border-slate-400 text-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/50"
+            />
+
+            <span className="text-sm leading-6 text-slate-200">
+              I agree to the{" "}
+              <Link
+                href="/terms"
+                className="font-medium text-white underline underline-offset-2 hover:text-slate-200"
+              >
+                DTS Works Terms of Service
+              </Link>{" "}
+              and acknowledge the{" "}
+              <Link
+                href="/privacy"
+                className="font-medium text-white underline underline-offset-2 hover:text-slate-200"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </span>
+          </label>
+
+          {!acceptedLegal && (
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              Please accept the Terms of Service and
+              acknowledge the Privacy Policy to continue.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  )}
+
+  {step === 4 && (
+    <div>
+      <div className="mb-7">
+        <h2 className="text-2xl font-semibold">
+          Choose your DTS Works plan
+        </h2>
+
+        <p className="mt-2 text-sm leading-6 text-slate-300">
+          Your workspace details are saved. Choose the
+          plan that fits your operation to continue to
+          secure payment.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        {PLANS.map((plan) => {
+          const isSelected = selectedPlan === plan.id;
+
+          return (
+            <button
+              key={plan.id}
+              type="button"
+              onClick={() => {
+                setSelectedPlan(plan.id);
+                setValidationError("");
+                setSubmitError("");
+                setSubmitErrorType(null);
+              }}
+              className={`w-full rounded-xl border p-5 text-left transition ${
+                isSelected
+                  ? "border-white bg-white text-[#142A52] shadow-lg"
+                  : "border-slate-500/50 bg-white/5 text-white hover:border-slate-300/70 hover:bg-white/[0.08]"
+              }`}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold">
+                    {plan.name}
+                  </h3>
+
+                  <p
+                    className={`mt-1 text-sm ${
+                      isSelected
+                        ? "text-slate-600"
+                        : "text-slate-300"
+                    }`}
+                  >
+                    {plan.description}
                   </p>
                 </div>
 
-                <div className="space-y-5">
-                  <div>
-                    <label
-                      htmlFor="first-name"
-                      className="mb-2 block text-sm font-medium text-slate-200"
-                    >
-                      First name
-                    </label>
-
-                    <input
-                      id="first-name"
-                      type="text"
-                      required
-                      value={firstName}
-                      onChange={(event) => {
-                        setFirstName(event.target.value);
-                        setValidationError("");
-                      }}
-                      className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
-                      placeholder="Your first name"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="organisation-name"
-                      className="mb-2 block text-sm font-medium text-slate-200"
-                    >
-                      Organisation name
-                    </label>
-
-                    <input
-                      id="organisation-name"
-                      type="text"
-                      required
-                      value={organisationName}
-                      onChange={(event) => {
-                        setOrganisationName(event.target.value);
-                        setValidationError("");
-                      }}
-                      className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
-                      placeholder="e.g. GreenCycle Recycling Ltd"
-                    />
-
-                    <p className="mt-2 text-xs leading-5 text-slate-400">
-                      Enter the legal or trading name of the
-                      business responsible for your DTS Works
-                      workspace.
-                    </p>
-                  </div>
-
-                  <div className="rounded-lg border border-slate-500/30 bg-white/5 px-4 py-4">
-                    <p className="text-sm font-medium text-white">
-                      Organisation = your business
-                    </p>
-
-                    <p className="mt-1 text-sm leading-6 text-slate-300">
-                      For example, your organisation could be
-                      &quot;GreenCycle Recycling Ltd&quot;. Your
-                      receiving sites are the physical waste
-                      facilities that belong to that organisation.
-                    </p>
-                  </div>
+                <div
+                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
+                    isSelected
+                      ? "bg-[#142A52] text-white"
+                      : "border border-slate-400/40 text-slate-200"
+                  }`}
+                >
+                  {plan.sites}
                 </div>
               </div>
-            )}
 
-            {step === 2 && (
-              <div>
-                <div className="mb-7">
-                  <h2 className="text-2xl font-semibold">
-                    Tell us about your receiving site
-                  </h2>
-
-                  <p className="mt-2 text-sm leading-6 text-slate-300">
-                    This is the physical waste facility or location
-                    where your operations take place.
-                  </p>
-                </div>
-
-                <div className="space-y-5">
-                  <div>
-                    <label
-                      htmlFor="site-name"
-                      className="mb-2 block text-sm font-medium text-slate-200"
-                    >
-                      Receiving site name
-                    </label>
-
-                    <input
-                      id="site-name"
-                      type="text"
-                      required
-                      value={siteName}
-                      onChange={(event) => {
-                        setSiteName(event.target.value);
-                        setValidationError("");
-                      }}
-                      className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
-                      placeholder="e.g. GreenCycle Birmingham Facility"
-                    />
-
-                    <p className="mt-2 text-xs leading-5 text-slate-400">
-                      Give the facility a name that helps you
-                      recognise it within DTS Works.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="full-address"
-                      className="mb-2 block text-sm font-medium text-slate-200"
-                    >
-                      Full address
-                    </label>
-
-                    <textarea
-                      id="full-address"
-                      required
-                      rows={3}
-                      value={fullAddress}
-                      onChange={(event) => {
-                        setFullAddress(event.target.value);
-                        setValidationError("");
-                      }}
-                      className="w-full resize-none rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
-                      placeholder="Enter the full receiving-site address"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="postcode"
-                      className="mb-2 block text-sm font-medium text-slate-200"
-                    >
-                      Postcode
-                    </label>
-
-                    <input
-                      id="postcode"
-                      type="text"
-                      required
-                      value={postcode}
-                      onChange={(event) => {
-                        setPostcode(event.target.value);
-                        setValidationError("");
-                      }}
-                      className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
-                      placeholder="e.g. W12 7ZL"
-                    />
-                  </div>
-
-                  <div className="rounded-lg border border-slate-500/30 bg-white/5 px-4 py-4">
-                    <p className="text-sm font-medium text-white">
-                      Receiving site = the physical facility
-                    </p>
-
-                    <p className="mt-1 text-sm leading-6 text-slate-300">
-                      For example, your organisation might be
-                      &quot;GreenCycle Recycling Ltd&quot; and your
-                      receiving site might be &quot;GreenCycle
-                      Birmingham Facility&quot;.
-                    </p>
-                  </div>
-
-                  <div className="rounded-lg border border-slate-500/30 bg-white/5 px-4 py-4">
-                    <p className="text-sm font-medium text-white">
-                      Run more than one site?
-                    </p>
-
-                    <p className="mt-1 text-sm leading-6 text-slate-300">
-                      You can add additional receiving sites later
-                      from your DTS Works workspace. Your organisation
-                      stays the same while each physical facility is
-                      recorded as its own receiving site.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div>
-                <div className="mb-7">
-                  <h2 className="text-2xl font-semibold">
-                    Authorisation &amp; contact
-                  </h2>
-
-                  <p className="mt-2 text-sm leading-6 text-slate-300">
-                    Add the regulatory and contact details DTS Works
-                    will use for your receiving-site records.
-                  </p>
-                </div>
-
-                <div className="space-y-5">
-                  <div>
-                    <label
-                      htmlFor="authorisation-number"
-                      className="mb-2 block text-sm font-medium text-slate-200"
-                    >
-                      Authorisation number
-                    </label>
-
-                    <input
-                      id="authorisation-number"
-                      type="text"
-                      required
-                      value={authorisationNumber}
-                      onChange={(event) => {
-                        setAuthorisationNumber(event.target.value);
-                        setValidationError("");
-                      }}
-                      className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
-                      placeholder="Enter your authorisation number"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="api-code"
-                      className="mb-2 block text-sm font-medium text-slate-200"
-                    >
-                      API code
-                    </label>
-
-                    <input
-                      id="api-code"
-                      type="text"
-                      required
-                      value={apiCode}
-                      onChange={(event) => {
-                        setApiCode(event.target.value);
-                        setValidationError("");
-                      }}
-                      className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
-                      placeholder="Enter your API code"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="email-address"
-                      className="mb-2 block text-sm font-medium text-slate-200"
-                    >
-                      Email address
-                    </label>
-
-                    <input
-                      id="email-address"
-                      type="email"
-                      value={emailAddress}
-                      onChange={(event) =>
-                        setEmailAddress(event.target.value)
-                      }
-                      className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="phone-number"
-                      className="mb-2 block text-sm font-medium text-slate-200"
-                    >
-                      Phone number{" "}
-                      <span className="font-normal text-slate-400">
-                        (optional)
-                      </span>
-                    </label>
-
-                    <input
-                      id="phone-number"
-                      type="tel"
-                      value={phoneNumber}
-                      onChange={(event) =>
-                        setPhoneNumber(event.target.value)
-                      }
-                      className="w-full rounded-lg border border-slate-500/50 bg-white px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/40"
-                      placeholder="Phone number"
-                    />
-                  </div>
-
-                  <div className="pt-3">
-                    <div className="mb-4">
-                      <h3 className="text-base font-semibold text-white">
-                        Review and accept
-                      </h3>
-
-                      <p className="mt-2 text-sm leading-6 text-slate-300">
-                        Before we save your workspace details,
-                        please review and accept the following.
-                      </p>
-                    </div>
-
-                    <label
-                      htmlFor="legal-acceptance"
-                      className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-500/40 bg-white/5 px-4 py-4 transition hover:bg-white/[0.07]"
-                    >
-                      <input
-                        id="legal-acceptance"
-                        type="checkbox"
-                        checked={acceptedLegal}
-                        onChange={(event) => {
-                          setAcceptedLegal(event.target.checked);
-                          setValidationError("");
-                        }}
-                        className="mt-1 h-4 w-4 shrink-0 cursor-pointer rounded border-slate-400 text-[#1E3768] focus:ring-2 focus:ring-[#1E3768]/50"
-                      />
-
-                      <span className="text-sm leading-6 text-slate-200">
-                        I agree to the{" "}
-                        <Link
-                          href="/terms"
-                          className="font-medium text-white underline underline-offset-2 hover:text-slate-200"
-                        >
-                          DTS Works Terms of Service
-                        </Link>{" "}
-                        and acknowledge the{" "}
-                        <Link
-                          href="/privacy"
-                          className="font-medium text-white underline underline-offset-2 hover:text-slate-200"
-                        >
-                          Privacy Policy
-                        </Link>
-                        .
-                      </span>
-                    </label>
-
-                    {!acceptedLegal && (
-                      <p className="mt-3 text-sm leading-6 text-slate-400">
-                        Please accept the Terms of Service and
-                        acknowledge the Privacy Policy to continue.
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {step === 4 && (
-              <div>
-                <div className="mb-7">
-                  <h2 className="text-2xl font-semibold">
-                    Choose your DTS Works plan
-                  </h2>
-
-                  <p className="mt-2 text-sm leading-6 text-slate-300">
-                    Your workspace details are saved. Choose the
-                    plan that fits your operation to continue to
-                    secure payment.
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  {PLANS.map((plan) => {
-                    const isSelected = selectedPlan === plan.id;
-
-                    return (
-                      <button
-                        key={plan.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedPlan(plan.id);
-                          setValidationError("");
-                          setSubmitError("");
-                          setSubmitErrorType(null);
-                        }}
-                        className={`w-full rounded-xl border p-5 text-left transition ${
-                          isSelected
-                            ? "border-white bg-white text-[#142A52] shadow-lg"
-                            : "border-slate-500/50 bg-white/5 text-white hover:border-slate-300/70 hover:bg-white/[0.08]"
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <h3 className="text-lg font-semibold">
-                              {plan.name}
-                            </h3>
-
-                            <p
-                              className={`mt-1 text-sm ${
-                                isSelected
-                                  ? "text-slate-600"
-                                  : "text-slate-300"
-                              }`}
-                            >
-                              {plan.description}
-                            </p>
-                          </div>
-
-                          <div
-                            className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
-                              isSelected
-                                ? "bg-[#142A52] text-white"
-                                : "border border-slate-400/40 text-slate-200"
-                            }`}
-                          >
-                            {plan.sites}
-                          </div>
-                        </div>
-
-                        <div className="mt-5 flex items-end justify-between gap-4">
-                          <p className="text-xl font-semibold">
-                            {plan.price}
-                          </p>
-
-                          <div
-                            className={`flex h-5 w-5 items-center justify-center rounded-full border ${
-                              isSelected
-                                ? "border-[#142A52] bg-[#142A52]"
-                                : "border-slate-400"
-                            }`}
-                          >
-                            {isSelected && (
-                              <span className="text-xs text-white">
-                                ✓
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="mt-6 rounded-lg border border-slate-500/30 bg-white/5 px-4 py-4">
-                  <p className="text-sm font-medium text-white">
-                    Your setup is almost complete.
-                  </p>
-
-                  <p className="mt-1 text-sm leading-6 text-slate-300">
-                    Your organisation, receiving site and setup
-                    details have been saved. Payment is the final
-                    step before your DTS Works workspace is
-                    activated.
-                  </p>
-                </div>
-
-                {selectedPlanDetails && (
-                  <div className="mt-4 rounded-lg border border-[#1E3768] bg-[#1E3768]/30 px-4 py-4">
-                    <p className="text-sm font-medium text-white">
-                      Selected plan
-                    </p>
-
-                    <div className="mt-1 flex items-center justify-between gap-4">
-                      <p className="text-sm text-slate-200">
-                        {selectedPlanDetails.name}
-                      </p>
-
-                      <p className="text-sm font-semibold text-white">
-                        {selectedPlanDetails.price}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <p className="mt-5 text-xs leading-5 text-slate-400">
-                  You&apos;ll be securely redirected to Stripe to
-                  complete payment. DTS Works will only activate
-                  your subscription after Stripe confirms the
-                  payment.
+              <div className="mt-5 flex items-end justify-between gap-4">
+                <p className="text-xl font-semibold">
+                  {plan.price}
                 </p>
+
+                <div
+                  className={`flex h-5 w-5 items-center justify-center rounded-full border ${
+                    isSelected
+                      ? "border-[#142A52] bg-[#142A52]"
+                      : "border-slate-400"
+                  }`}
+                >
+                  {isSelected && (
+                    <span className="text-xs text-white">
+                      ✓
+                    </span>
+                  )}
+                </div>
               </div>
-            )}
+            </button>
+          );
+        })}
+      </div>
 
-            {(validationError || submitError) && (
-              <div
-                role="alert"
-                className="mt-6 rounded-lg border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200"
-              >
-                {validationError ? (
-                  validationError
-                ) : (
-                  <>
-                    <p className="font-semibold text-red-100">
-                      {submitErrorType === "network" &&
-                        "We couldn't connect to DTS Works"}
+      <div className="mt-6 rounded-lg border border-slate-500/30 bg-white/5 px-4 py-4">
+        <p className="text-sm font-medium text-white">
+          Your setup is almost complete.
+        </p>
 
-                      {submitErrorType === "auth" &&
-                        "Your session needs attention"}
+        <p className="mt-1 text-sm leading-6 text-slate-300">
+          Your organisation, receiving site and setup
+          details have been saved. Payment is the final
+          step before your DTS Works workspace is
+          activated.
+        </p>
+      </div>
 
-                      {submitErrorType === "validation" &&
-                        "Check your information"}
+      {selectedPlanDetails && (
+        <div className="mt-4 rounded-lg border border-[#1E3768] bg-[#1E3768]/30 px-4 py-4">
+          <p className="text-sm font-medium text-white">
+            Selected plan
+          </p>
 
-                      {submitErrorType === "server" &&
-                        "Something went wrong"}
+          <div className="mt-1 flex items-center justify-between gap-4">
+            <p className="text-sm text-slate-200">
+              {selectedPlanDetails.name}
+            </p>
 
-                      {submitErrorType === "unknown" &&
-                        "Something unexpected happened"}
-                    </p>
-
-                    <p className="mt-1">
-                      {submitError}
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
-
-            <div className="mt-10 flex items-center justify-between gap-4">
-              <button
-                type="button"
-                onClick={goBack}
-                disabled={step === 1 || isSubmitting}
-                className="rounded-lg border border-slate-500/50 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-white/40 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                Back
-              </button>
-
-              {step < 3 ? (
-                <button
-                  type="button"
-                  onClick={goContinue}
-                  disabled={isSubmitting}
-                  className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  Continue
-                </button>
-              ) : step === 3 ? (
-                <button
-                  type="button"
-                  onClick={goContinue}
-                  disabled={isSubmitting || !acceptedLegal}
-                  className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isSubmitting
-                    ? "Saving setup…"
-                    : "Continue to plan"}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleContinueToPayment}
-                  disabled={isSubmitting || !selectedPlan}
-                  className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isSubmitting
-                    ? "Preparing payment…"
-                    : "Continue to payment"}
-                </button>
-              )}
-            </div>
-
-            {step === 3 && (
-              <p className="mt-3 text-center text-xs text-slate-400">
-                Your organisation and receiving-site information
-                will be saved before you continue to payment.
-              </p>
-            )}
-
-            {step === 4 && (
-              <p className="mt-3 text-center text-xs text-slate-400">
-                Secure payment is provided by Stripe. Your DTS Works
-                subscription will be confirmed after payment is
-                verified.
-              </p>
-            )}
+            <p className="text-sm font-semibold text-white">
+              {selectedPlanDetails.price}
+            </p>
           </div>
         </div>
-      </section>
-    </main>
-  );
+      )}
+
+      <p className="mt-5 text-xs leading-5 text-slate-400">
+        You&apos;ll be securely redirected to Stripe to
+        complete payment. DTS Works will only activate
+        your subscription after Stripe confirms the
+        payment.
+      </p>
+    </div>
+  )}
+
+  {(validationError || submitError) && (
+    <div
+      role="alert"
+      className="mt-6 rounded-lg border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200"
+    >
+      {validationError ? (
+        validationError
+      ) : (
+        <>
+          <p className="font-semibold text-red-100">
+            {submitErrorType === "network" &&
+              "We couldn't connect to DTS Works"}
+
+            {submitErrorType === "auth" &&
+              "Your session needs attention"}
+
+            {submitErrorType === "validation" &&
+              "Check your information"}
+
+            {submitErrorType === "server" &&
+              "Something went wrong"}
+
+            {submitErrorType === "unknown" &&
+              "Something unexpected happened"}
+          </p>
+
+          <p className="mt-1">
+            {submitError}
+          </p>
+        </>
+      )}
+    </div>
+  )}
+
+  <div className="mt-10 flex items-center justify-between gap-4">
+    <button
+      type="button"
+      onClick={goBack}
+      disabled={step === 1 || isSubmitting}
+      className="rounded-lg border border-slate-500/50 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-white/40 disabled:cursor-not-allowed disabled:opacity-30"
+    >
+      Back
+    </button>
+
+    {step < 3 ? (
+      <button
+        type="button"
+        onClick={goContinue}
+        disabled={isSubmitting}
+        className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        Continue
+      </button>
+    ) : step === 3 ? (
+      <button
+        type="button"
+        onClick={goContinue}
+        disabled={isSubmitting || !acceptedLegal}
+        className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {isSubmitting
+          ? "Saving setup…"
+          : "Continue to plan"}
+      </button>
+    ) : (
+      <button
+        type="button"
+        onClick={handleContinueToPayment}
+        disabled={isSubmitting || !selectedPlan}
+        className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {isSubmitting
+          ? "Preparing payment…"
+          : "Continue to payment"}
+      </button>
+    )}
+  </div>
+
+  {step === 3 && (
+    <p className="mt-3 text-center text-xs text-slate-400">
+      Your organisation and receiving-site information
+      will be saved before you continue to payment.
+    </p>
+  )}
+
+    {step === 4 && (
+    <p className="mt-3 text-center text-xs text-slate-400">
+      Secure payment is provided by Stripe. Your DTS Works
+      subscription will be confirmed after payment is
+      verified.
+    </p>
+  )}
+        </div>
+      </div>
+    </section>
+  </main>
+);
 }
