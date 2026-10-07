@@ -124,9 +124,7 @@ def sync_subscription(subscription) -> tuple[str, str]:
             subscription.get("current_period_end")
         ),
         "cancel_at_period_end": subscription.get("cancel_at_period_end", False),
-        "cancel_at": stripe_timestamp_to_iso(
-            subscription.get("cancel_at")
-        ),
+        
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
 
