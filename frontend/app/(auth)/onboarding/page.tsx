@@ -1304,18 +1304,7 @@ export default function OnboardingPage() {
         })}
       </div>
 
-      <div className="mt-6 rounded-lg border border-slate-500/30 bg-white/5 px-4 py-4">
-        <p className="text-sm font-medium text-white">
-          Your setup is almost complete.
-        </p>
-
-        <p className="mt-1 text-sm leading-6 text-slate-300">
-          Your organisation, receiving site and setup
-          details have been saved. Payment is the final
-          step before your DTS Works workspace is
-          activated.
-        </p>
-      </div>
+    
 
       {selectedPlanDetails && (
         <div className="mt-4 rounded-lg border border-[#1E3768] bg-[#1E3768]/30 px-4 py-4">
@@ -1336,10 +1325,8 @@ export default function OnboardingPage() {
       )}
 
       <p className="mt-5 text-xs leading-5 text-slate-400">
-        You&apos;ll be securely redirected to Stripe to
-        complete payment. DTS Works will only activate
-        your subscription after Stripe confirms the
-        payment.
+        You&apos;ll be redirected to Stripe to
+        complete payment. 
       </p>
     </div>
   )}
@@ -1429,13 +1416,7 @@ export default function OnboardingPage() {
     </p>
   )}
 
-    {step === 4 && (
-    <p className="mt-3 text-center text-xs text-slate-400">
-      Secure payment is provided by Stripe. Your DTS Works
-      subscription will be confirmed after payment is
-      verified.
-    </p>
-  )}
+  
         </div>
       </div>
     </section>
