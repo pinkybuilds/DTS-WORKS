@@ -31,6 +31,7 @@ from backend.site_profile.schema import (
     SiteProfileResponse,
 )
 from backend.stripe.checkout import router as stripe_router
+from backend.stripe.webhook import router as stripe_webhook_router
 from backend.traffic_cop.router import handle_waste_intake
 
 
@@ -67,6 +68,7 @@ site_profile_repository = SiteProfileRepository()
 app.include_router(registry_router)
 app.include_router(onboarding_router)
 app.include_router(stripe_router)
+app.include_router(stripe_webhook_router)
 
 
 @app.post("/intake-screening")
