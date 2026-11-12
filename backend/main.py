@@ -2,6 +2,8 @@ import logging
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from backend.auth.access_context import OrganisationAccessContext
+from backend.auth.access_dependencies import require_full_access
 
 from backend.auth.dependencies import get_authenticated_user_id
 from backend.core_compliance.audit_ledger import (
@@ -114,6 +116,7 @@ def intake_screening(payload: dict):
 @app.post("/log-waste")
 def log_waste(
     data: dict,
+    access_context: OrganisationAccessContext = Depends(require_full_access),
     user_id: str = Depends(get_authenticated_user_id),
 ):
     print(
