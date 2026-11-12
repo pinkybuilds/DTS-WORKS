@@ -6,7 +6,6 @@ from fastapi import HTTPException, status
 
 from backend.auth.access_policy import (
     AccessDecision,
-    AccessLevel,
     determine_subscription_access,
 )
 from backend.database.supabase_client import supabase
@@ -30,15 +29,32 @@ CURRENT_SUBSCRIPTION_STATUSES = {
 }
 
 
+VALID_ORGANISATION_ROLES = {
+    "OWNER",
+    "ADMIN",
+    "MEMBER",
+}
+
+
 def get_organisation_access_context(
     user_id: str,
+    organisation_id: str | None = None,
 ) -> OrganisationAccessContext:
     """
-    Resolve the authenticated user's organisation, membership role,
-    subscription and effective access level.
+    Resolve the authenticated user's selected organisation,
+    membership role, subscription and subscription access level.
 
-    Current product assumption: one organisation per user.
-    Ambiguous memberships or subscriptions fail closed.
+    Users may belong to multiple organisations.
+
+    If an organisation ID is supplied, the user must be a member
+    of that organisation.
+
+    If no organisation ID is supplied:
+    - One membership is selected automatically.
+    - Multiple memberships require explicit selection.
+
+    Organisation IDs are context selectors, never proof of access.
+    Membership is always verified against the authenticated user.
     """
 
     try:
@@ -46,7 +62,6 @@ def get_organisation_access_context(
             supabase.table("organisation_members")
             .select("organisation_id, role")
             .eq("user_id", user_id)
-            .limit(2)
             .execute()
         )
     except Exception:
@@ -63,23 +78,45 @@ def get_organisation_access_context(
             detail="No organisation membership found.",
         )
 
-    if len(memberships) != 1:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Multiple organisation memberships require selection.",
-        )
+    # If an organisation was explicitly selected, verify that
+    # the authenticated user actually belongs to it.
+    if organisation_id:
+        matching_memberships = [
+            membership
+            for membership in memberships
+            if str(membership.get("organisation_id")) == str(organisation_id)
+        ]
 
-    membership = memberships[0]
+        if not matching_memberships:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have access to this organisation.",
+            )
 
-    organisation_id = membership.get("organisation_id")
+        membership = matching_memberships[0]
+
+    else:
+        # Automatically select only when there is exactly one
+        # organisation membership.
+        if len(memberships) > 1:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Organisation selection required.",
+            )
+
+        membership = memberships[0]
+
+    selected_organisation_id = membership.get("organisation_id")
     role = str(membership.get("role") or "").upper()
 
-    if not organisation_id or not role:
+    if not selected_organisation_id or role not in VALID_ORGANISATION_ROLES:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Organisation membership is incomplete.",
+            detail="Organisation membership is incomplete or invalid.",
         )
 
+    # Retrieve subscription information for the selected
+    # organisation only.
     try:
         subscription_result = (
             supabase.table("subscriptions")
@@ -87,7 +124,7 @@ def get_organisation_access_context(
                 "status, payment_failed_at, grace_period_ends_at, "
                 "created_at, updated_at"
             )
-            .eq("organisation_id", organisation_id)
+            .eq("organisation_id", selected_organisation_id)
             .order("updated_at", desc=True)
             .execute()
         )
@@ -109,22 +146,27 @@ def get_organisation_access_context(
     if len(current_subscriptions) > 1:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Multiple current subscriptions found. Please contact support.",
+            detail=(
+                "Multiple current subscriptions found. "
+                "Please contact support."
+            ),
         )
 
     if current_subscriptions:
         subscription = current_subscriptions[0]
+
     elif subscriptions:
         # No current subscription: use the most recently updated
         # historical record to determine whether access is read-only.
         subscription = subscriptions[0]
+
     else:
         subscription = None
 
     access = determine_subscription_access(subscription)
 
     return OrganisationAccessContext(
-        organisation_id=str(organisation_id),
+        organisation_id=str(selected_organisation_id),
         role=role,
         subscription=subscription,
         access=access,

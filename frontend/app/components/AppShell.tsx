@@ -1,9 +1,11 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import AppNavigation from "./AppNavigation";
 import { supabase } from "@/lib/supabase/client";
+import { OrganisationProvider } from "@/contexts/OrganisationContext";
 
 export default function AppShell({
   children,
@@ -77,9 +79,11 @@ export default function AppShell({
   }
 
   return (
-    <div className="min-h-screen">
-      <AppNavigation />
-      <main className="min-w-0">{children}</main>
-    </div>
+    <OrganisationProvider>
+      <div className="min-h-screen">
+        <AppNavigation />
+        <main className="min-w-0">{children}</main>
+      </div>
+    </OrganisationProvider>
   );
 }

@@ -1,0 +1,90 @@
+
+from fastapi import APIRouter, Depends, HTTPException, status
+
+from backend.auth.dependencies import get_authenticated_user_id
+from backend.database.supabase_client import supabase
+
+
+router = APIRouter(
+    prefix="/organisations",
+    tags=["organisations"],
+)
+
+
+@router.get("")
+def get_user_organisations(
+    user_id: str = Depends(get_authenticated_user_id),
+):
+    """
+    Return only the organisations that the authenticated user
+    belongs to, together with their role in each organisation.
+    """
+
+    try:
+        membership_result = (
+            supabase
+            .table("organisation_members")
+            .select("organisation_id, role")
+            .eq("user_id", user_id)
+            .execute()
+        )
+
+        memberships = membership_result.data or []
+
+        if not memberships:
+            return []
+
+        organisation_ids = [
+            membership["organisation_id"]
+            for membership in memberships
+            if membership.get("organisation_id")
+        ]
+
+        if not organisation_ids:
+            return []
+
+        organisation_result = (
+            supabase
+            .table("organisations")
+            .select("id, name")
+            .in_("id", organisation_ids)
+            .execute()
+        )
+
+        organisations = organisation_result.data or []
+
+        organisation_lookup = {
+            str(organisation["id"]): organisation
+            for organisation in organisations
+        }
+
+        result = []
+
+        for membership in memberships:
+            organisation_id = membership.get("organisation_id")
+
+            if not organisation_id:
+                continue
+
+            organisation = organisation_lookup.get(
+                str(organisation_id)
+            )
+
+            if not organisation:
+                continue
+
+            result.append(
+                {
+                    "organisation_id": str(organisation["id"]),
+                    "organisation_name": organisation["name"],
+                    "role": str(membership.get("role") or "").upper(),
+                }
+            )
+
+        return result
+
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Unable to retrieve your organisations.",
+        )

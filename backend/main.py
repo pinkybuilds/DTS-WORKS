@@ -23,6 +23,7 @@ from backend.gateway.exceptions import (
     ServiceUnavailableError,
 )
 from backend.onboarding.router import router as onboarding_router
+from backend.organisations.router import router as organisations_router
 from backend.onboarding.schema import OnboardingRequest
 from backend.site_profile.models import SiteAddress, SiteProfile
 from backend.site_profile.repository import SiteProfileRepository
@@ -67,6 +68,7 @@ site_profile_repository = SiteProfileRepository()
 
 app.include_router(registry_router)
 app.include_router(onboarding_router)
+app.include_router(organisations_router)
 app.include_router(stripe_router)
 app.include_router(stripe_webhook_router)
 
