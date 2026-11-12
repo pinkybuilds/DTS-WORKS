@@ -3,9 +3,11 @@ import logging
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from backend.auth.access_context import OrganisationAccessContext
-from backend.auth.access_dependencies import require_full_access
-
-from backend.auth.dependencies import get_authenticated_user_id
+from backend.auth.access_dependencies import (
+    require_full_access,
+    require_read_access,
+)
+from backend.auth.site_context import SiteAccessContext, get_site_context
 from backend.core_compliance.audit_ledger import (
     AuditEventType,
     AuditLedger,
@@ -117,7 +119,7 @@ def intake_screening(payload: dict):
 def log_waste(
     data: dict,
     access_context: OrganisationAccessContext = Depends(require_full_access),
-    user_id: str = Depends(get_authenticated_user_id),
+    site_context: SiteAccessContext = Depends(get_site_context),
 ):
     print(
         "=== /log-waste WAS HIT ===",
@@ -222,8 +224,8 @@ def log_waste(
             )
 
             site_profile = (
-                site_profile_repository.get_site_profile(user_id)
-            )
+           site_profile_repository.get_site_profile(site_context.site_id)
+           )
 
             if site_profile is None:
                 raise RodaProtocolError(
@@ -286,9 +288,7 @@ def log_waste(
                     flush=True,
                 )
 
-                site_id = site_profile_repository.get_site_id(
-                    user_id
-                )
+                site_id = site_context.site_id
 
                 receipt_data = validated_log.model_dump(
                     mode="json"
@@ -396,9 +396,7 @@ def log_waste(
                     flush=True,
                 )
 
-                site_id = site_profile_repository.get_site_id(
-                    user_id
-                )
+                site_id = site_context.site_id
 
                 receipt_data = validated_log.model_dump(
                     mode="json"
@@ -495,9 +493,7 @@ def log_waste(
                     flush=True,
                 )
 
-                site_id = site_profile_repository.get_site_id(
-                    user_id
-                )
+                site_id = site_context.site_id
 
                 receipt_data = validated_log.model_dump(
                     mode="json"
@@ -599,9 +595,7 @@ def log_waste(
                 flush=True,
             )
 
-            site_id = site_profile_repository.get_site_id(
-                user_id
-            )
+            site_id = site_context.site_id
 
             receipt_data = validated_log.model_dump(
                 mode="json"
@@ -794,10 +788,12 @@ def debug_test():
     response_model=SiteProfileResponse,
 )
 def get_site_profile(
-    user_id: str = Depends(get_authenticated_user_id),
+    access_context: OrganisationAccessContext = Depends(require_read_access),
+    site_context: SiteAccessContext = Depends(get_site_context),
 ):
-    return site_profile_repository.get_site_profile(user_id)
-
+    return site_profile_repository.get_site_profile(
+        site_context.site_id
+    )
 
 @app.put(
     "/site-profile",
@@ -805,7 +801,8 @@ def get_site_profile(
 )
 def update_site_profile(
     data: SiteProfileRequest,
-    user_id: str = Depends(get_authenticated_user_id),
+    access_context: OrganisationAccessContext = Depends(require_full_access),
+    site_context: SiteAccessContext = Depends(get_site_context),
 ):
     site_profile = SiteProfile(
         organisation_name=data.organisation_name,
@@ -821,9 +818,9 @@ def update_site_profile(
     )
 
     return site_profile_repository.save_site_profile(
-        user_id,
-        site_profile,
-    )
+    site_context.site_id,
+    site_profile,
+)
 
 
 @app.get("/")

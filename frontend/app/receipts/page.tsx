@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { useOrganisation } from "@/contexts/OrganisationContext";
 
 type ReceiptData = {
   waste_items?: {
@@ -25,12 +26,35 @@ export default function ReceiptsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const {
+    selectedOrganisation,
+    loading: organisationLoading,
+    sites,
+    selectedSite,
+    siteLoading,
+    siteError,
+  } = useOrganisation();
+
   useEffect(() => {
+    let active = true;
+
     const loadReceipts = async () => {
+      if (organisationLoading || siteLoading) {
+        setLoading(true);
+        return;
+      }
+
+      if (!selectedOrganisation || !selectedSite) {
+        setReceipts([]);
+        setError("");
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError("");
 
-      const { data, error } = await supabase
+      const { data, error: queryError } = await supabase
         .from("movements")
         .select(
           `
@@ -42,21 +66,35 @@ export default function ReceiptsPage() {
             receipt_data
           `,
         )
+        .eq("site_id", selectedSite.site_id)
         .order("date_time_received", { ascending: false });
 
-      if (error) {
-        console.error("Failed to load receipts:", error);
-        setError("We couldn't load your receipts.");
-        setLoading(false);
+      if (!active) {
         return;
       }
 
-      setReceipts(data ?? []);
+      if (queryError) {
+        console.error("Failed to load receipts:", queryError);
+        setReceipts([]);
+        setError("We couldn't load your receipts.");
+      } else {
+        setReceipts(data ?? []);
+      }
+
       setLoading(false);
     };
 
-    loadReceipts();
-  }, []);
+    void loadReceipts();
+
+    return () => {
+      active = false;
+    };
+  }, [
+    organisationLoading,
+    siteLoading,
+    selectedOrganisation?.organisation_id,
+    selectedSite?.site_id,
+  ]);
 
   const formatDate = (date: string | null) => {
     if (!date) return "—";
@@ -96,11 +134,16 @@ export default function ReceiptsPage() {
     return "bg-slate-100 text-slate-700";
   };
 
+  const selectionMessage = !selectedOrganisation
+    ? "Select an organisation from the navigation menu to view its receipts."
+    : sites.length === 0
+      ? "This organisation does not have any sites yet."
+      : "Select a site from the navigation menu to view its receipts.";
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <section className="w-full">
         <div className="px-5 pb-10 pt-7 md:px-10 md:pb-12 md:pt-8">
-          {/* Back to dashboard */}
           <div className="mb-6">
             <Link
               href="/"
@@ -110,7 +153,6 @@ export default function ReceiptsPage() {
             </Link>
           </div>
 
-          {/* Page heading */}
           <div className="mb-9">
             <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
               <div>
@@ -132,26 +174,31 @@ export default function ReceiptsPage() {
             </div>
           </div>
 
-          {/* Loading */}
-          {loading && (
+          {organisationLoading || siteLoading || loading ? (
             <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
               <p className="text-sm text-slate-500">
                 Loading receipts...
               </p>
             </div>
-          )}
-
-          {/* Error */}
-          {!loading && error && (
+          ) : siteError ? (
+            <div className="rounded-2xl border border-red-200 bg-white p-8 text-center">
+              <p className="text-sm font-medium text-red-700">
+                {siteError}
+              </p>
+            </div>
+          ) : !selectedOrganisation || !selectedSite ? (
+            <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+              <p className="text-sm font-medium text-slate-700">
+                {selectionMessage}
+              </p>
+            </div>
+          ) : error ? (
             <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
               <p className="text-sm font-medium text-red-700">
                 {error}
               </p>
             </div>
-          )}
-
-          {/* Empty state */}
-          {!loading && !error && receipts.length === 0 && (
+          ) : receipts.length === 0 ? (
             <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
               <p className="text-sm font-medium text-slate-700">
                 No receipts yet
@@ -161,10 +208,7 @@ export default function ReceiptsPage() {
                 Recorded waste receipts will appear here.
               </p>
             </div>
-          )}
-
-          {/* Receipt cards */}
-          {!loading && !error && receipts.length > 0 && (
+          ) : (
             <div className="space-y-3">
               {receipts.map((receipt) => {
                 const firstWasteItem =
@@ -186,7 +230,6 @@ export default function ReceiptsPage() {
                     className="group block rounded-2xl border border-slate-800 bg-white px-5 py-4 transition hover:bg-slate-50 hover:shadow-sm md:px-6 md:py-4"
                   >
                     <div className="flex items-center gap-4">
-                      {/* Receipt details */}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-3">
                           <p className="truncate text-sm font-semibold text-slate-900">
@@ -203,18 +246,14 @@ export default function ReceiptsPage() {
                         </div>
 
                         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
-                          <span>
-                            EWC: {ewc}
-                          </span>
+                          <span>EWC: {ewc}</span>
 
                           <span className="text-slate-300">
                             •
                           </span>
 
                           <span>
-                            {formatDate(
-                              receipt.date_time_received,
-                            )}
+                            {formatDate(receipt.date_time_received)}
                           </span>
                         </div>
 
@@ -223,7 +262,6 @@ export default function ReceiptsPage() {
                         </p>
                       </div>
 
-                      {/* Arrow */}
                       <span
                         aria-hidden="true"
                         className="shrink-0 text-lg text-slate-500 transition-transform group-hover:translate-x-0.5"

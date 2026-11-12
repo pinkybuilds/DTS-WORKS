@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -17,6 +16,11 @@ export type Organisation = {
   role: "OWNER" | "ADMIN" | "MEMBER";
 };
 
+export type Site = {
+  site_id: string;
+  site_name: string;
+};
+
 type OrganisationContextType = {
   organisations: Organisation[];
   selectedOrganisation: Organisation | null;
@@ -24,6 +28,12 @@ type OrganisationContextType = {
   error: string | null;
   selectOrganisation: (organisationId: string) => void;
   refreshOrganisations: () => Promise<void>;
+
+  sites: Site[];
+  selectedSite: Site | null;
+  siteLoading: boolean;
+  siteError: string | null;
+  selectSite: (siteId: string) => void;
 };
 
 const OrganisationContext =
@@ -42,6 +52,11 @@ export function OrganisationProvider({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [sites, setSites] = useState<Site[]>([]);
+  const [selectedSite, setSelectedSite] = useState<Site | null>(null);
+  const [siteLoading, setSiteLoading] = useState(false);
+  const [siteError, setSiteError] = useState<string | null>(null);
+
   const refreshOrganisations = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -53,11 +68,13 @@ export function OrganisationProvider({
       } = await supabase.auth.getSession();
 
       if (sessionError || !session?.access_token) {
-        throw new Error("Your session could not be verified. Please log in again.");
+        throw new Error(
+          "Your session could not be verified. Please log in again.",
+        );
       }
 
       const apiUrl =
-       process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+        process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
       const response = await fetch(
         `${apiUrl.replace(/\/$/, "")}/organisations`,
@@ -88,10 +105,7 @@ export function OrganisationProvider({
         setSelectedOrganisation(savedOrganisation);
       } else if (data.length === 1) {
         setSelectedOrganisation(data[0]);
-        localStorage.setItem(
-          STORAGE_KEY,
-          data[0].organisation_id,
-        );
+        localStorage.setItem(STORAGE_KEY, data[0].organisation_id);
       } else {
         setSelectedOrganisation(null);
         localStorage.removeItem(STORAGE_KEY);
@@ -118,15 +132,139 @@ export function OrganisationProvider({
         return;
       }
 
+      setSelectedSite(null);
+      setSites([]);
+      setSiteError(null);
+
       setSelectedOrganisation(organisation);
       localStorage.setItem(STORAGE_KEY, organisationId);
     },
     [organisations],
   );
 
+  const selectSite = useCallback(
+    (siteId: string) => {
+      const site = sites.find((item) => item.site_id === siteId);
+
+      if (!site || !selectedOrganisation) {
+        return;
+      }
+
+      setSelectedSite(site);
+
+      localStorage.setItem(
+        `dts_selected_site_${selectedOrganisation.organisation_id}`,
+        siteId,
+      );
+    },
+    [sites, selectedOrganisation],
+  );
+
   useEffect(() => {
     void refreshOrganisations();
   }, [refreshOrganisations]);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadSites = async () => {
+      if (!selectedOrganisation) {
+        setSites([]);
+        setSelectedSite(null);
+        setSiteLoading(false);
+        setSiteError(null);
+        return;
+      }
+
+      setSiteLoading(true);
+      setSiteError(null);
+      setSites([]);
+      setSelectedSite(null);
+
+      try {
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+
+        if (sessionError || !session?.access_token) {
+          throw new Error(
+            "Your session could not be verified. Please log in again.",
+          );
+        }
+
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
+        const response = await fetch(
+          `${apiUrl.replace(/\/$/, "")}/organisations/sites`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+              "X-Organisation-ID":
+                selectedOrganisation.organisation_id,
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Unable to retrieve this organisation's sites.");
+        }
+
+        const data: Site[] = await response.json();
+
+        if (!active) {
+          return;
+        }
+
+        setSites(data);
+
+        const savedSiteId = localStorage.getItem(
+          `dts_selected_site_${selectedOrganisation.organisation_id}`,
+        );
+
+        const savedSite = data.find(
+          (site) => site.site_id === savedSiteId,
+        );
+
+        if (savedSite) {
+          setSelectedSite(savedSite);
+        } else if (data.length === 1) {
+          setSelectedSite(data[0]);
+
+          localStorage.setItem(
+            `dts_selected_site_${selectedOrganisation.organisation_id}`,
+            data[0].site_id,
+          );
+        } else {
+          setSelectedSite(null);
+        }
+      } catch (err) {
+        if (!active) {
+          return;
+        }
+
+        setSites([]);
+        setSelectedSite(null);
+        setSiteError(
+          err instanceof Error
+            ? err.message
+            : "Something went wrong while loading your sites.",
+        );
+      } finally {
+        if (active) {
+          setSiteLoading(false);
+        }
+      }
+    };
+
+    void loadSites();
+
+    return () => {
+      active = false;
+    };
+  }, [selectedOrganisation?.organisation_id]);
 
   return (
     <OrganisationContext.Provider
@@ -137,6 +275,11 @@ export function OrganisationProvider({
         error,
         selectOrganisation,
         refreshOrganisations,
+        sites,
+        selectedSite,
+        siteLoading,
+        siteError,
+        selectSite,
       }}
     >
       {children}

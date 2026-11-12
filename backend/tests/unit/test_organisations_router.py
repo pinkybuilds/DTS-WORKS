@@ -199,3 +199,91 @@ def test_supabase_error_returns_service_unavailable(monkeypatch):
 
     assert error.value.status_code == 503
     assert error.value.detail == "Unable to retrieve your organisations."
+
+def test_returns_only_sites_for_selected_organisation(monkeypatch):
+    mock_supabase(
+        monkeypatch,
+        {
+            "sites": [
+                {
+                    "id": "site-1",
+                    "name": "Birmingham Site",
+                    "organisation_id": "org-1",
+                },
+                {
+                    "id": "site-2",
+                    "name": "Manchester Site",
+                    "organisation_id": "org-1",
+                },
+                {
+                    "id": "site-3",
+                    "name": "Someone Else's Site",
+                    "organisation_id": "org-2",
+                },
+            ],
+        },
+    )
+
+    access_context = SimpleNamespace(
+        organisation_id="org-1"
+    )
+
+    result = organisations_router.get_organisation_sites(
+        access_context=access_context
+    )
+
+    assert result == [
+        {
+            "site_id": "site-1",
+            "site_name": "Birmingham Site",
+        },
+        {
+            "site_id": "site-2",
+            "site_name": "Manchester Site",
+        },
+    ]
+
+
+def test_returns_empty_list_when_organisation_has_no_sites(monkeypatch):
+    mock_supabase(
+        monkeypatch,
+        {
+            "sites": [],
+        },
+    )
+
+    access_context = SimpleNamespace(
+        organisation_id="org-1"
+    )
+
+    result = organisations_router.get_organisation_sites(
+        access_context=access_context
+    )
+
+    assert result == []
+
+
+def test_site_lookup_error_returns_service_unavailable(monkeypatch):
+    class BrokenSupabase:
+        def table(self, table_name):
+            raise Exception("Database connection failed")
+
+    monkeypatch.setattr(
+        organisations_router,
+        "supabase",
+        BrokenSupabase(),
+    )
+
+    access_context = SimpleNamespace(
+        organisation_id="org-1"
+    )
+
+    with pytest.raises(HTTPException) as error:
+        organisations_router.get_organisation_sites(
+            access_context=access_context
+        )
+
+    assert error.value.status_code == 503
+    assert error.value.detail == (
+        "Unable to retrieve your organisation's sites."
+    )

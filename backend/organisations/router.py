@@ -1,9 +1,9 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
-
 from backend.auth.dependencies import get_authenticated_user_id
+from backend.auth.access_context import OrganisationAccessContext
+from backend.auth.access_dependencies import get_access_context
 from backend.database.supabase_client import supabase
-
 
 router = APIRouter(
     prefix="/organisations",
@@ -87,4 +87,39 @@ def get_user_organisations(
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Unable to retrieve your organisations.",
+        )
+
+
+@router.get("/sites")
+def get_organisation_sites(
+    access_context: OrganisationAccessContext = Depends(get_access_context),
+):
+    """
+    Return the sites belonging to the selected organisation.
+    The organisation is verified through get_access_context.
+    """
+
+    try:
+        result = (
+            supabase
+            .table("sites")
+            .select("id, name")
+            .eq("organisation_id", access_context.organisation_id)
+            .execute()
+        )
+
+        sites = result.data or []
+
+        return [
+            {
+                "site_id": str(site["id"]),
+                "site_name": site["name"],
+            }
+            for site in sites
+        ]
+
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Unable to retrieve your organisation's sites.",
         )
