@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 
@@ -30,6 +30,8 @@ type OnboardingDraft = {
   phoneNumber?: string;
   acceptedLegal?: boolean;
   selectedPlan?: Plan | "";
+  checkoutAttemptId?: string;
+  checkoutSessionId?: string;
   onboardingSaved?: boolean;
 };
 
@@ -94,12 +96,14 @@ export default function OnboardingPage() {
   const [apiCode, setApiCode] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const DEV_PREVIEW = process.env.NODE_ENV !== "production";
-
+  
 
   const [acceptedLegal, setAcceptedLegal] = useState(false);
 
   const [selectedPlan, setSelectedPlan] = useState<Plan | "">("");
+  const [checkoutAttemptId, setCheckoutAttemptId] = useState("");
+  const [checkoutSessionId, setCheckoutSessionId] = useState("");
+  const cancellationRequestStarted = useRef(false);
 
   const [onboardingSaved, setOnboardingSaved] = useState(false);
 
@@ -121,23 +125,26 @@ export default function OnboardingPage() {
    */
   useEffect(() => {
     const savedDraft = sessionStorage.getItem(ONBOARDING_DRAFT_KEY);
+    let checkoutWasCancelled = false;
+let planFromUrl: Plan | "" = "";
 
-    let planFromUrl: Plan | "" = "";
+try {
+  const params = new URLSearchParams(window.location.search);
+  const plan = params.get("plan");
+  const checkout = params.get("checkout");
 
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const plan = params.get("plan");
+  checkoutWasCancelled = checkout === "cancelled";
 
-      if (
-        plan === "starter" ||
-        plan === "professional" ||
-        plan === "business"
-      ) {
-        planFromUrl = plan;
-      }
-    } catch {
-      planFromUrl = "";
-    }
+  if (
+    plan === "starter" ||
+    plan === "professional" ||
+    plan === "business"
+  ) {
+    planFromUrl = plan;
+  }
+} catch {
+  planFromUrl = "";
+}
 
     if (!savedDraft) {
       if (planFromUrl) {
@@ -177,6 +184,14 @@ export default function OnboardingPage() {
       }
 
       setOnboardingSaved(draft.onboardingSaved ?? false);
+
+setCheckoutAttemptId(draft.checkoutAttemptId ?? "");
+
+setCheckoutSessionId(
+  checkoutWasCancelled
+    ? draft.checkoutSessionId ?? ""
+    : draft.checkoutSessionId ?? "",
+);
     } catch {
       sessionStorage.removeItem(ONBOARDING_DRAFT_KEY);
 
@@ -187,6 +202,128 @@ export default function OnboardingPage() {
       setIsDraftLoaded(true);
     }
   }, []);
+  useEffect(() => {
+  if (!isDraftLoaded) return;
+
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get("checkout") !== "cancelled") return;
+
+  if (cancellationRequestStarted.current) return;
+
+  cancellationRequestStarted.current = true;
+
+  const expireCancelledCheckout = async () => {
+    try {
+      if (!checkoutSessionId) {
+        setSubmitErrorType("server");
+        setSubmitError(
+          "We couldn't identify your previous checkout session. Please contact support if this continues.",
+        );
+        return;
+      }
+
+      // Retrieve the authenticated user's access token.
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error || !data.session?.access_token) {
+        setSubmitErrorType("auth");
+        setSubmitError(
+          "Your session has expired. Please sign in again and try again.",
+        );
+        return;
+      }
+
+      // Ask our backend to expire the abandoned Stripe session.
+      const response = await fetch(
+        `${API_BASE_URL}/stripe/expire-checkout-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${data.session.access_token}`,
+          },
+          body: JSON.stringify({
+            session_id: checkoutSessionId,
+          }),
+        },
+      );
+
+      let result: {
+        status?: string;
+        detail?: string;
+      } = {};
+
+      try {
+        result = await response.json();
+      } catch {
+        result = {};
+      }
+
+      if (!response.ok || result.status !== "expired") {
+        console.error(
+          "Could not expire cancelled Stripe Checkout Session:",
+          response.status,
+          result,
+        );
+
+        setSubmitErrorType("server");
+        setSubmitError(
+          "We couldn't update your previous checkout session. Please refresh the page and try again.",
+        );
+        return;
+      }
+
+      // The backend confirmed that the session is expired.
+      // Now it is safe to remove the cancellation marker.
+      params.delete("checkout");
+
+      const remainingQuery = params.toString();
+
+      window.history.replaceState(
+        {},
+        "",
+        `${window.location.pathname}${
+          remainingQuery ? `?${remainingQuery}` : ""
+        }${window.location.hash}`,
+      );
+
+      // Clear the old checkout IDs but preserve onboarding details.
+      const savedDraft = sessionStorage.getItem(
+        ONBOARDING_DRAFT_KEY,
+      );
+
+      if (savedDraft) {
+        const draft: OnboardingDraft = JSON.parse(savedDraft);
+
+        sessionStorage.setItem(
+          ONBOARDING_DRAFT_KEY,
+          JSON.stringify({
+            ...draft,
+            checkoutAttemptId: "",
+            checkoutSessionId: "",
+          }),
+        );
+      }
+
+      setCheckoutAttemptId("");
+      setCheckoutSessionId("");
+
+    } catch (error) {
+      console.error(
+        "Error handling cancelled Stripe Checkout:",
+        error,
+      );
+
+      setSubmitErrorType("network");
+      setSubmitError(
+        "We couldn't update your previous checkout session. Please refresh the page and try again.",
+      );
+    }
+  };
+
+  void expireCancelledCheckout();
+}, [isDraftLoaded, checkoutSessionId]);
 
   /*
    * Persist the onboarding draft so the user can leave and
@@ -198,20 +335,23 @@ export default function OnboardingPage() {
     }
 
     const draft: OnboardingDraft = {
-      step,
-      firstName,
-      organisationName,
-      siteName,
-      fullAddress,
-      postcode,
-      authorisationNumber,
-      apiCode,
-      emailAddress,
-      phoneNumber,
-      acceptedLegal,
-      selectedPlan,
-      onboardingSaved,
-    };
+      
+   step,
+  firstName,
+  organisationName,
+  siteName,
+  fullAddress,
+  postcode,
+  authorisationNumber,
+  apiCode,
+  emailAddress,
+  phoneNumber,
+  acceptedLegal,
+  selectedPlan,
+  checkoutAttemptId,
+  checkoutSessionId,
+  onboardingSaved,
+};
 
     sessionStorage.setItem(
       ONBOARDING_DRAFT_KEY,
@@ -231,6 +371,8 @@ export default function OnboardingPage() {
     phoneNumber,
     acceptedLegal,
     selectedPlan,
+    checkoutAttemptId,
+    checkoutSessionId,
     onboardingSaved,
   ]);
 
@@ -261,22 +403,7 @@ export default function OnboardingPage() {
   };
 
   const goContinue = () => {
-    if (DEV_PREVIEW) {
-  clearErrors();
-  setValidationError("");
-  setSubmitError("");
-  setSubmitErrorType(null);
-
-  setStep((currentStep) => {
-  if (currentStep === 1) return 2;
-  if (currentStep === 2) return 3;
-  if (currentStep === 3) return 4;
-  return currentStep;
-});
-
-  return;
-}
-    clearErrors();
+     clearErrors();
 
     if (step === 1) {
       const missingFields: string[] = [];
@@ -655,6 +782,15 @@ export default function OnboardingPage() {
         return;
       }
 
+            // Reuse the same attempt ID when retrying this checkout.
+      // Generate a new one only when there is no existing attempt.
+      const attemptId =
+        checkoutAttemptId || crypto.randomUUID();
+
+      if (!checkoutAttemptId) {
+        setCheckoutAttemptId(attemptId);
+      }
+
       let response: Response;
 
       try {
@@ -668,6 +804,7 @@ export default function OnboardingPage() {
             },
             body: JSON.stringify({
               plan: selectedPlan,
+              attempt_id: attemptId,
             }),
           },
         );
@@ -688,6 +825,7 @@ export default function OnboardingPage() {
       let result: {
         detail?: string | Array<{ msg?: string }>;
         checkout_url?: string;
+        session_id?: string;
         url?: string;
       } = {};
 
@@ -752,30 +890,57 @@ export default function OnboardingPage() {
       }
 
       const checkoutUrl =
-        result.checkout_url || result.url;
+  result.checkout_url || result.url;
 
-      if (!checkoutUrl) {
-        console.error(
-          "Stripe Checkout response did not contain a checkout URL:",
-          result,
-        );
+const sessionId = result.session_id;
 
-        setSubmitErrorType("server");
-        setSubmitError(
-          "We couldn't start payment. Please try again.",
-        );
+if (!checkoutUrl || !sessionId) {
+  console.error(
+    "Stripe Checkout response was missing the checkout URL or session ID:",
+    result,
+  );
+  setSubmitErrorType("server");
+  setSubmitError(
+    "We couldn't start payment. Please try again.",
+  );
+  return;
+}
+     /*
+ * Save the Stripe Checkout Session ID before redirecting.
+ * This lets us identify and expire the session if the
+ * customer returns without completing payment.
+ */
 
-        return;
-      }
+const updatedDraft: OnboardingDraft = {
+  step,
+  firstName,
+  organisationName,
+  siteName,
+  fullAddress,
+  postcode,
+  authorisationNumber,
+  apiCode,
+  emailAddress,
+  phoneNumber,
+  acceptedLegal,
+  selectedPlan,
+  checkoutAttemptId: attemptId,
+  checkoutSessionId: sessionId,
+  onboardingSaved,
+};
 
-      /*
-       * Do not remove the onboarding draft yet.
-       *
-       * If the customer leaves Stripe without completing payment,
-       * we want their onboarding information and selected plan
-       * to remain available when they return.
-       */
-      window.location.href = checkoutUrl;
+sessionStorage.setItem(
+  ONBOARDING_DRAFT_KEY,
+  JSON.stringify(updatedDraft),
+);
+
+setCheckoutSessionId(sessionId);
+
+/*
+ * Keep the onboarding draft available when the customer
+ * returns from Stripe.
+ */
+window.location.href = checkoutUrl;
     } catch (error) {
       console.error(
         "Unexpected Stripe Checkout error:",
@@ -1240,12 +1405,15 @@ export default function OnboardingPage() {
             <button
               key={plan.id}
               type="button"
-              onClick={() => {
-                setSelectedPlan(plan.id);
-                setValidationError("");
-                setSubmitError("");
-                setSubmitErrorType(null);
-              }}
+                onClick={() => {
+               if (selectedPlan !== plan.id) {
+              setCheckoutAttemptId("");
+              }
+              setSelectedPlan(plan.id);
+              setValidationError("");
+              setSubmitError("");
+               setSubmitErrorType(null);
+            }}
               className={`w-full rounded-xl border p-5 text-left transition ${
                 isSelected
                   ? "border-white bg-white text-[#142A52] shadow-lg"
@@ -1388,7 +1556,7 @@ export default function OnboardingPage() {
       <button
         type="button"
         onClick={goContinue}
-       disabled={isSubmitting || (!DEV_PREVIEW && !acceptedLegal)}
+       disabled={isSubmitting || !acceptedLegal}
         className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-[#142A52] transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white/70 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting
